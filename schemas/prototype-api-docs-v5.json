@@ -17,7 +17,7 @@
     },
     "api_version": {
       "type": "integer",
-      "enum": [4]
+      "enum": [5]
     },
     "prototypes": {
       "type": "array",
@@ -38,72 +38,58 @@
   ],
   "$defs": {
     "prototype": {
-      "type": "object",
-      "properties": {
-        "name": { "type": "string" },
-        "order": { "type": "integer" },
-        "description": { "type": "string" },
-        "lists": { "type": "array", "items": { "type": "string" } },
-        "examples": { "type": "array", "items": { "type": "string" } },
-        "images": { "type": "array", "items": { "$ref": "#/$defs/image" } },
-        "parent": { "type": "string" },
-        "abstract": { "type": "boolean" },
-        "typename": { "type": "string" },
-        "instance_limit": {
-          "oneOf": [{ "type": "string" }, { "type": "integer" }]
+      "allOf": [
+        {
+          "$ref": "#/$defs/basic_member"
         },
-        "deprecated": { "type": "boolean" },
-        "properties": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/property" }
-        },
-        "custom_properties": {
-          "$ref": "#/$defs/custom_property"
+        {
+          "type": "object",
+          "properties": {
+            "visibility": { "type": "array", "items": { "type": "string" } },
+            "parent": { "type": "string" },
+            "abstract": { "type": "boolean" },
+            "typename": { "type": "string" },
+            "instance_limit": { "type": "integer" },
+            "deprecated": { "type": "boolean" },
+            "properties": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/property" }
+            },
+            "custom_properties": {
+              "$ref": "#/$defs/custom_property"
+            }
+          },
+          "required": ["abstract", "deprecated", "properties"]
         }
-      },
-      "required": [
-        "name",
-        "order",
-        "description",
-        "abstract",
-        "deprecated",
-        "properties"
       ]
     },
     "image": {
       "type": "object",
       "properties": {
         "filename": { "type": "string" },
-        "caption": {
-          "oneOf": [{ "type": "string" }, { "type": "null" }]
-        }
+        "caption": { "type": "string" }
       },
       "required": ["filename"]
     },
     "property": {
-      "type": "object",
-      "properties": {
-        "name": { "type": "string" },
-        "order": { "type": "integer" },
-        "description": { "type": "string" },
-        "lists": { "type": "array", "items": { "type": "string" } },
-        "examples": { "type": "array", "items": { "type": "string" } },
-        "images": { "type": "array", "items": { "$ref": "#/$defs/image" } },
-        "alt_name": { "type": "string" },
-        "override": { "type": "boolean" },
-        "type": { "$ref": "#/$defs/type" },
-        "optional": { "type": "boolean" },
-        "default": {
-          "oneOf": [{ "type": "string" }, { "$ref": "#/$defs/literal" }]
+      "allOf": [
+        {
+          "$ref": "#/$defs/basic_member"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "visibility": { "type": "array", "items": { "type": "string" } },
+            "alt_name": { "type": "string" },
+            "override": { "type": "boolean" },
+            "type": { "$ref": "#/$defs/type" },
+            "optional": { "type": "boolean" },
+            "default": {
+              "oneOf": [{ "type": "string" }, { "$ref": "#/$defs/literal" }]
+            }
+          },
+          "required": ["override", "type", "optional"]
         }
-      },
-      "required": [
-        "name",
-        "order",
-        "description",
-        "override",
-        "type",
-        "optional"
       ]
     },
     "type": {
@@ -192,6 +178,27 @@
       "required": ["description", "key_type", "value_type"]
     },
     "type_concept": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/basic_member"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "parent": { "type": "string" },
+            "abstract": { "type": "boolean" },
+            "inline": { "type": "boolean" },
+            "type": { "$ref": "#/$defs/type" },
+            "properties": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/property" }
+            }
+          },
+          "required": ["abstract", "inline", "type"]
+        }
+      ]
+    },
+    "basic_member": {
       "type": "object",
       "properties": {
         "name": { "type": "string" },
@@ -199,17 +206,9 @@
         "description": { "type": "string" },
         "lists": { "type": "array", "items": { "type": "string" } },
         "examples": { "type": "array", "items": { "type": "string" } },
-        "images": { "type": "array", "items": { "$ref": "#/$defs/image" } },
-        "parent": { "type": "string" },
-        "abstract": { "type": "boolean" },
-        "inline": { "type": "boolean" },
-        "type": { "$ref": "#/$defs/type" },
-        "properties": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/property" }
-        }
+        "images": { "type": "array", "items": { "$ref": "#/$defs/image" } }
       },
-      "required": ["name", "order", "description", "abstract", "inline", "type"]
+      "required": ["name", "order", "description"]
     }
   }
 }

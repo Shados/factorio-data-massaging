@@ -64,6 +64,7 @@ get_doc_versions = ->
     return parse_versions_html html_str
 
 parse_versions_html = (html_str) ->
+  -- Aww yeah, time to ~~parse~~scrape HTML with regex :V
   versions = [{(tonumber major), (tonumber minor), (tonumber sub)} for major, minor, sub in html_str\gmatch ">%s-(%d+)%.(%d+)%.(%d+)%s-<"]
   table.sort versions, version_sort
   versions = for version in *versions
