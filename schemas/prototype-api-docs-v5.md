@@ -5,5 +5,3 @@ Quirks:
         - `Prototype`
         - `Type/Concept`
         - `Property`
-- `Prototype`'s `custom_properties` is actually just a single `CustomProperty`,
-  not an array of them.

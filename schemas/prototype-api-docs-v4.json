@@ -58,7 +58,7 @@
           "items": { "$ref": "#/$defs/property" }
         },
         "custom_properties": {
-          "$ref": "#/$defs/custom_property"
+          "$ref": "#/$defs/custom_properties"
         }
       },
       "required": [
@@ -179,7 +179,7 @@
       },
       "required": ["complex_type", "value"]
     },
-    "custom_property": {
+    "custom_properties": {
       "type": "object",
       "properties": {
         "description": { "type": "string" },

@@ -17,7 +17,7 @@
     },
     "api_version": {
       "type": "integer",
-      "enum": [5]
+      "enum": [6]
     },
     "prototypes": {
       "type": "array",
@@ -26,6 +26,10 @@
     "types": {
       "type": "array",
       "items": { "$ref": "#/$defs/type_concept" }
+    },
+    "defines": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/define" }
     }
   },
   "required": [
@@ -34,7 +38,8 @@
     "application_version",
     "api_version",
     "prototypes",
-    "types"
+    "types",
+    "defines"
   ],
   "$defs": {
     "prototype": {
@@ -207,6 +212,35 @@
         "lists": { "type": "array", "items": { "type": "string" } },
         "examples": { "type": "array", "items": { "type": "string" } },
         "images": { "type": "array", "items": { "$ref": "#/$defs/image" } }
+      },
+      "required": ["name", "order", "description"]
+    },
+    "define": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/basic_member"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "values": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/define_value" }
+            },
+            "subkeys": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/define" }
+            }
+          }
+        }
+      ]
+    },
+    "define_value": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" }
       },
       "required": ["name", "order", "description"]
     }
