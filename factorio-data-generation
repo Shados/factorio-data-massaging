@@ -19,6 +19,10 @@ JSON_DOCS_DIR = "#{SCRIPT_DIR}/json-docs"
 RUNTIME_DOCS_DIR = "#{SCRIPT_DIR}/json-docs/runtime-api"
 RUNTIME_DOCS_EARLIEST_VERSION = {1, 1, 35}
 SCHEMA_DIR = "#{SCRIPT_DIR}/schemas"
+KNOWN_BUGGED_RUNTIME_DOC_VERSIONS = {
+  "1.1.108": true
+}
+
 
 main = ->
   runtime_doc_version_list = get_doc_versions!
@@ -103,7 +107,11 @@ validate_json_docs = (versions) ->
       if valid
         print "#{version}: valid"
       else
-        print "#{version}: invalid\n#{err}"
+        if KNOWN_BUGGED_RUNTIME_DOC_VERSIONS[version]
+          print "#{version}: invalid: known issue, the JSON from this version is bugged, see #{SCHEMA_DIR}/runtime-api-docs-bugs.md"
+        else
+          print "#{version}: invalid"
+        print err
 
 initialise_json_schema_validators = ->
   print "Parsing JSON Schemas"
@@ -111,7 +119,6 @@ initialise_json_schema_validators = ->
   assert schema_dir != nil, "Failed to open #{SCHEMA_DIR}, errno #{errno}, error: #{err}"
   validators = {}
   for {:name} in schema_dir\files!
-    --                   " runtime-api-docs-v1.json"
     version = name\match "^runtime%-api%-docs%-v(%d+)%.json$"
     continue unless version
     schema_json = rapidjson.load "#{SCHEMA_DIR}/#{name}"

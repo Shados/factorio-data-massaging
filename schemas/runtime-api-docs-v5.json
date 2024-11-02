@@ -1,0 +1,512 @@
+{
+  "title": "Factorio machine-readable runtime API docs v2",
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "application": {
+      "type": "string",
+      "enum": ["factorio"]
+    },
+    "stage": {
+      "type": "string",
+      "enum": ["runtime"]
+    },
+    "application_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "api_version": {
+      "type": "integer",
+      "enum": [5]
+    },
+    "classes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/class"
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    },
+    "defines": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/define"
+      }
+    },
+    "concepts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/concept"
+      }
+    },
+    "global_objects": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/global_object"
+      }
+    },
+    "global_functions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/method"
+      }
+    }
+  },
+  "required": [
+    "application",
+    "stage",
+    "application_version",
+    "api_version",
+    "classes",
+    "events",
+    "defines",
+    "concepts",
+    "global_objects"
+  ],
+  "$defs": {
+    "class": {
+      "allOf": [
+        { "$ref": "#/$defs/basic_member" },
+        {
+          "type": "object",
+          "properties": {
+            "visibility": { "type": "string" },
+            "parent": { "type": "string" },
+            "abstract": { "type": "boolean" },
+            "methods": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/method" }
+            },
+            "attributes": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/attribute" }
+            },
+            "operators": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/operator" }
+            }
+          },
+          "required": ["abstract", "methods", "attributes", "operators"]
+        }
+      ]
+    },
+    "method": {
+      "allOf": [
+        { "$ref": "#/$defs/basic_member" },
+        {
+          "type": "object",
+          "properties": {
+            "visibility": { "type": "string" },
+            "raises": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/event_raised" }
+            },
+            "subclasses": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "parameters": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/parameter"
+              }
+            },
+            "variant_parameter_groups": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/parameter_group" }
+            },
+            "variant_parameter_description": {
+              "type": "string"
+            },
+            "variadic_parameter": {
+              "type": "object",
+              "parameters": {
+                "type": { "$ref": "#/$defs/type" },
+                "description": { "type": "string" }
+              }
+            },
+            "format": {
+              "type": "object",
+              "parameters": {
+                "takes_table": { "type": "boolean" },
+                "table_optional": { "type": "boolean" }
+              },
+              "required": ["takes_table"]
+            },
+            "return_values": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/return_value" }
+            }
+          },
+          "required": ["parameters"]
+        }
+      ]
+    },
+    "event_raised": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "timeframe": {
+          "type": "string",
+          "enum": ["instantly", "current_tick", "future_tick"]
+        },
+        "optional": { "type": "boolean" }
+      },
+      "required": ["name", "order", "description", "timeframe", "optional"]
+    },
+    "parameter": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "type": { "$ref": "#/$defs/type" },
+        "optional": { "type": "boolean" }
+      },
+      "required": ["name", "order", "description", "type", "optional"]
+    },
+    "return_value": {
+      "type": "object",
+      "properties": {
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "type": { "$ref": "#/$defs/type" },
+        "optional": { "type": "boolean" }
+      },
+      "required": ["order", "description", "type", "optional"]
+    },
+    "parameter_group": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "parameters": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/parameter" }
+        }
+      },
+      "required": ["name", "order", "description", "parameters"]
+    },
+    "type": {
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["type"]
+            },
+            "value": { "$ref": "#/$defs/type" },
+            "description": { "type": "string" }
+          },
+          "required": ["complex_type", "value", "description"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["union"]
+            },
+            "options": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/type"
+              }
+            },
+            "full_format": { "type": "boolean" }
+          },
+          "required": ["complex_type", "options", "full_format"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["array"]
+            },
+            "value": {
+              "$ref": "#/$defs/type"
+            }
+          },
+          "required": ["complex_type", "value"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["dictionary", "LuaCustomTable"]
+            },
+            "key": {
+              "$ref": "#/$defs/type"
+            },
+            "value": {
+              "$ref": "#/$defs/type"
+            }
+          },
+          "required": ["complex_type", "key", "value"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["table"]
+            },
+            "parameters": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/parameter"
+              }
+            },
+            "variant_parameter_groups": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/parameter_group"
+              }
+            },
+            "variant_parameter_description": {
+              "type": "string"
+            }
+          },
+          "required": ["complex_type", "parameters"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["tuple"]
+            },
+            "values": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/type"
+              }
+            }
+          },
+          "required": ["complex_type", "values"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["function"]
+            },
+            "parameters": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/type"
+              }
+            }
+          },
+          "required": ["complex_type", "parameters"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["literal"]
+            },
+            "value": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "number" },
+                { "type": "boolean" }
+              ]
+            },
+            "description": { "type": "string" }
+          },
+          "required": ["complex_type", "value"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["LuaLazyLoadedValue"]
+            },
+            "value": {
+              "$ref": "#/$defs/type"
+            }
+          },
+          "required": ["complex_type", "value"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["LuaStruct"]
+            },
+            "attributes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/attribute"
+              }
+            }
+          },
+          "required": ["complex_type", "attributes"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["builtin"]
+            }
+          },
+          "required": ["complex_type"]
+        }
+      ]
+    },
+    "attribute": {
+      "allOf": [
+        { "$ref": "#/$defs/basic_member" },
+        {
+          "type": "object",
+          "properties": {
+            "visibility": { "type": "string" },
+            "raises": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/event_raised" }
+            },
+            "subclasses": { "type": "array", "items": { "type": "string" } },
+            "type": { "$ref": "#/$defs/type" },
+            "optional": { "type": "boolean" },
+            "read": { "type": "boolean" },
+            "write": { "type": "boolean" }
+          },
+          "required": ["type", "optional", "read", "write"]
+        }
+      ]
+    },
+    "operator": {
+      "allOf": [
+        {
+          "oneOf": [
+            { "$ref": "#/$defs/method" },
+            { "$ref": "#/$defs/attribute" }
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "enum": ["call", "index", "length"]
+            }
+          },
+          "required": ["name"]
+        }
+      ]
+    },
+    "event": {
+      "allOf": [
+        { "$ref": "#/$defs/basic_member" },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/parameter"
+              }
+            },
+            "filter": { "type": "string" }
+          },
+          "required": ["data"]
+        }
+      ]
+    },
+    "define": {
+      "allOf": [
+        { "$ref": "#/$defs/basic_member" },
+        {
+          "type": "object",
+          "properties": {
+            "values": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/define_value" }
+            },
+            "subkeys": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/define" }
+            }
+          }
+        }
+      ]
+    },
+    "define_value": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" }
+      },
+      "required": ["name", "order", "description"]
+    },
+    "basic_member": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "lists": { "type": "array", "items": { "type": "string" } },
+        "examples": { "type": "array", "items": { "type": "string" } },
+        "images": { "type": "array", "items": { "$ref": "#/$defs/image" } }
+      },
+      "required": ["name", "order", "description"]
+    },
+    "image": {
+      "type": "object",
+      "properties": {
+        "filename": { "type": "string" },
+        "caption": { "type": "string" }
+      },
+      "required": ["filename"]
+    },
+    "concept": {
+      "allOf": [
+        { "$ref": "#/$defs/basic_member" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "$ref": "#/$defs/type" }
+          },
+          "required": ["type"]
+        }
+      ]
+    },
+    "spec": {
+      "type": "object",
+      "properties": {
+        "type": { "$ref": "#/$defs/type" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" }
+      },
+      "required": ["type", "order", "description"]
+    },
+    "global_object": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "type": { "$ref": "#/$defs/type" }
+      },
+      "required": ["name", "order", "description", "type"]
+    }
+  }
+}
