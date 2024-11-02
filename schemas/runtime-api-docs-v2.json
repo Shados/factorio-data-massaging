@@ -124,7 +124,7 @@
         },
         "variant_parameter_groups": {
           "type": "array",
-          "items": { "$ref": "#/$defs/parameter_group" }
+          "items": { "$ref": "#/$defs/parameter_group_lax" }
         },
         "variant_parameter_description": {
           "type": "string"
@@ -176,6 +176,19 @@
       "required": ["order", "description", "type", "optional"]
     },
     "parameter_group": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "parameters": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/parameter" }
+        }
+      },
+      "required": ["name", "order", "description", "parameters"]
+    },
+    "parameter_group_lax": {
       "type": "object",
       "properties": {
         "name": { "type": "string" },
@@ -411,7 +424,7 @@
                 },
                 "variant_parameter_groups": {
                   "type": "array",
-                  "items": { "$ref": "#/$defs/parameter_group" }
+                  "items": { "$ref": "#/$defs/parameter_group_lax" }
                 },
                 "variant_parameter_description": {
                   "type": "string"

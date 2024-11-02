@@ -1,5 +1,5 @@
 {
-  "title": "Factorio machine-readable runtime API docs v1",
+  "title": "Factorio machine-readable runtime API docs v2",
   "$schema": "https://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
@@ -17,7 +17,7 @@
     },
     "api_version": {
       "type": "integer",
-      "enum": [1]
+      "enum": [4]
     },
     "classes": {
       "type": "array",
@@ -54,6 +54,12 @@
       "items": {
         "$ref": "#/$defs/global_object"
       }
+    },
+    "global_functions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/method"
+      }
     }
   },
   "required": [
@@ -77,7 +83,6 @@
         "description": { "type": "string" },
         "notes": { "type": "array", "items": { "type": "string" } },
         "examples": { "type": "array", "items": { "type": "string" } },
-        "see_also": { "type": "array", "items": { "type": "string" } },
         "methods": {
           "type": "array",
           "items": { "$ref": "#/$defs/method" }
@@ -90,6 +95,7 @@
           "type": "array",
           "items": { "$ref": "#/$defs/operator" }
         },
+        "abstract": { "type": "boolean" },
         "base_classes": { "type": "array", "items": { "type": "string" } }
       },
       "required": [
@@ -98,7 +104,8 @@
         "description",
         "methods",
         "attributes",
-        "operators"
+        "operators",
+        "abstract"
       ]
     },
     "method": {
@@ -109,7 +116,10 @@
         "description": { "type": "string" },
         "notes": { "type": "array", "items": { "type": "string" } },
         "examples": { "type": "array", "items": { "type": "string" } },
-        "see_also": { "type": "array", "items": { "type": "string" } },
+        "raises": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/event_raised" }
+        },
         "subclasses": {
           "type": "array",
           "items": { "type": "string" }
@@ -122,7 +132,7 @@
         },
         "variant_parameter_groups": {
           "type": "array",
-          "items": { "$ref": "#/$defs/parameter_group_lax" }
+          "items": { "$ref": "#/$defs/parameter_group" }
         },
         "variant_parameter_description": {
           "type": "string"
@@ -131,10 +141,26 @@
         "variadic_description": { "type": "string" },
         "takes_table": { "type": "boolean" },
         "table_is_optional": { "type": "boolean" },
-        "return_type": { "$ref": "#/$defs/type" },
-        "return_description": { "type": "string" }
+        "return_values": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/return_value" }
+        }
       },
       "required": ["name", "order", "description", "parameters", "takes_table"]
+    },
+    "event_raised": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "timeframe": {
+          "type": "string",
+          "enum": ["instantly", "current_tick", "future_tick"]
+        },
+        "optional": { "type": "boolean" }
+      },
+      "required": ["name", "order", "description", "timeframe", "optional"]
     },
     "parameter": {
       "type": "object",
@@ -147,20 +173,17 @@
       },
       "required": ["name", "order", "description", "type", "optional"]
     },
-    "parameter_group": {
+    "return_value": {
       "type": "object",
       "properties": {
-        "name": { "type": "string" },
         "order": { "type": "integer" },
         "description": { "type": "string" },
-        "parameters": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/parameter" }
-        }
+        "type": { "$ref": "#/$defs/type" },
+        "optional": { "type": "boolean" }
       },
-      "required": ["name", "order", "description", "parameters"]
+      "required": ["order", "description", "type", "optional"]
     },
-    "parameter_group_lax": {
+    "parameter_group": {
       "type": "object",
       "properties": {
         "name": { "type": "string" },
@@ -181,16 +204,29 @@
           "properties": {
             "complex_type": {
               "type": "string",
-              "enum": ["variant"]
+              "enum": ["type"]
+            },
+            "value": { "$ref": "#/$defs/type" },
+            "description": { "type": "string" }
+          },
+          "required": ["complex_type", "value", "description"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["union"]
             },
             "options": {
               "type": "array",
               "items": {
                 "$ref": "#/$defs/type"
               }
-            }
+            },
+            "full_format": { "type": "boolean" }
           },
-          "required": ["complex_type", "options"]
+          "required": ["complex_type", "options", "full_format"]
         },
         {
           "type": "object",
@@ -242,6 +278,24 @@
           "properties": {
             "complex_type": {
               "type": "string",
+              "enum": ["literal"]
+            },
+            "value": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "number" },
+                { "type": "boolean" }
+              ]
+            },
+            "description": { "type": "string" }
+          },
+          "required": ["complex_type", "value"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
               "enum": ["LuaLazyLoadedValue"]
             },
             "value": {
@@ -255,7 +309,23 @@
           "properties": {
             "complex_type": {
               "type": "string",
-              "enum": ["table"]
+              "enum": ["LuaStruct"]
+            },
+            "attributes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/attribute"
+              }
+            }
+          },
+          "required": ["complex_type", "attributes"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["table", "tuple"]
             },
             "parameters": {
               "type": "array",
@@ -285,13 +355,25 @@
         "description": { "type": "string" },
         "notes": { "type": "array", "items": { "type": "string" } },
         "examples": { "type": "array", "items": { "type": "string" } },
-        "see_also": { "type": "array", "items": { "type": "string" } },
+        "raises": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/event_raised" }
+        },
         "subclasses": { "type": "array", "items": { "type": "string" } },
         "type": { "$ref": "#/$defs/type" },
+        "optional": { "type": "boolean" },
         "read": { "type": "boolean" },
         "write": { "type": "boolean" }
       },
-      "required": ["name", "order", "description", "type", "read", "write"]
+      "required": [
+        "name",
+        "order",
+        "description",
+        "type",
+        "optional",
+        "read",
+        "write"
+      ]
     },
     "operator": {
       "allOf": [
@@ -321,7 +403,6 @@
         "description": { "type": "string" },
         "notes": { "type": "array", "items": { "type": "string" } },
         "examples": { "type": "array", "items": { "type": "string" } },
-        "see_also": { "type": "array", "items": { "type": "string" } },
         "data": {
           "type": "array",
           "items": {
@@ -367,132 +448,16 @@
       "required": ["name", "order", "description"]
     },
     "concept": {
-      "allOf": [
-        {
-          "type": "object",
-          "properties": {
-            "name": { "type": "string" },
-            "order": { "type": "integer" },
-            "description": { "type": "string" },
-            "notes": { "type": "array", "items": { "type": "string" } },
-            "examples": { "type": "array", "items": { "type": "string" } },
-            "see_also": { "type": "array", "items": { "type": "string" } }
-          },
-          "required": ["name", "order", "description"]
-        },
-        {
-          "oneOf": [
-            {
-              "type": "object",
-              "properties": {
-                "category": {
-                  "type": "string",
-                  "enum": ["table"]
-                },
-                "parameters": {
-                  "type": "array",
-                  "items": { "$ref": "#/$defs/parameter" }
-                },
-                "variant_parameter_groups": {
-                  "type": "array",
-                  "items": { "$ref": "#/$defs/parameter_group_lax" }
-                },
-                "variant_parameter_description": {
-                  "type": "string"
-                }
-              },
-              "required": ["category", "parameters"]
-            },
-            {
-              "type": "object",
-              "properties": {
-                "category": {
-                  "type": "string",
-                  "enum": ["filter"]
-                },
-                "parameters": {
-                  "type": "array",
-                  "items": { "$ref": "#/$defs/parameter" }
-                },
-                "variant_parameter_groups": {
-                  "type": "array",
-                  "items": { "$ref": "#/$defs/parameter_group" }
-                },
-                "variant_parameter_description": {
-                  "type": "string"
-                }
-              },
-              "required": ["category", "parameters"]
-            },
-            {
-              "type": "object",
-              "properties": {
-                "category": {
-                  "type": "string",
-                  "enum": ["table_or_array"]
-                },
-                "parameters": {
-                  "type": "array",
-                  "items": { "$ref": "#/$defs/parameter" }
-                }
-              },
-              "required": ["category", "parameters"]
-            },
-            {
-              "type": "object",
-              "properties": {
-                "category": {
-                  "type": "string",
-                  "enum": ["enum", "flag"]
-                },
-                "options": {
-                  "type": "array",
-                  "items": { "$ref": "#/$defs/basic_member" }
-                }
-              },
-              "required": ["category", "options"]
-            },
-            {
-              "type": "object",
-              "properties": {
-                "category": {
-                  "type": "string",
-                  "enum": ["union"]
-                },
-                "options": {
-                  "type": "array",
-                  "items": { "$ref": "#/$defs/spec" }
-                }
-              },
-              "required": ["category", "options"]
-            },
-            {
-              "type": "object",
-              "properties": {
-                "category": {
-                  "type": "string",
-                  "enum": ["struct"]
-                },
-                "attributes": {
-                  "type": "array",
-                  "items": { "$ref": "#/$defs/attribute" }
-                }
-              },
-              "required": ["category", "attributes"]
-            },
-            {
-              "type": "object",
-              "properties": {
-                "category": {
-                  "type": "string",
-                  "enum": ["concept"]
-                }
-              },
-              "required": ["category"]
-            }
-          ]
-        }
-      ]
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "notes": { "type": "array", "items": { "type": "string" } },
+        "examples": { "type": "array", "items": { "type": "string" } },
+        "type": { "$ref": "#/$defs/type" }
+      },
+      "required": ["name", "order", "description", "type"]
     },
     "spec": {
       "type": "object",
