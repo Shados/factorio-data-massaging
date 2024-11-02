@@ -1,0 +1,81 @@
+#!/usr/bin/env -S yue -e
+
+import "inspect"
+import "jsonschema"
+import "unix"
+import "rapidjson"
+import "ssl.https"
+
+-- "https://lua-api.factorio.com/next/runtime-api.json"
+local *
+
+API_BASE = "https://lua-api.factorio.com/"
+SCRIPT_DIR = do
+  str = debug.getinfo(1, "S").source
+  str\match "(.*)/"
+CACHE_DIR = "#{SCRIPT_DIR}/cache"
+JSON_DOCS_DIR = "#{SCRIPT_DIR}/json-docs"
+RUNTIME_DOCS_EARLIEST_VERSION = {1, 1, 35}
+
+main = ->
+  unix.mkpath CACHE_DIR
+  doc_version_list = get_doc_versions!
+  ensure_runtime_docs doc_version_list
+
+  -- runtime_api_json = rapidjson.load("runtime-api-1.1.35.json")
+  -- schema_json = rapidjson.load("schemas/runtime-api-docs-v1.json")
+  -- validator = jsonschema.generate_validator schema_json, {
+  --   null: rapidjson.null
+  -- }
+  -- print(validator runtime_api_json)
+  return
+
+get_doc_versions = ->
+  cached_file = "#{CACHE_DIR}/api-docs-version-list.html"
+  if unix.stat cached_file
+    print "Using cached API docs version list"
+    with io.open cached_file, "r"
+      html_str = \read "*a"
+      \close!
+      return parse_versions_html html_str
+  else
+    res, code, _, status = https.request API_BASE
+    assert res, "Failed to get documentation version list page (#{API_BASE}), code: #{code}, status: #{status}"
+    with io.open cached_file, "w"
+      \write res
+      \close!
+    return parse_versions_html res
+
+parse_versions_html = (html_str) ->
+  versions = [{(tonumber major), (tonumber minor), (tonumber sub)} for major, minor, sub in html_str\gmatch ">%s-(%d+)%.(%d+)%.(%d+)%s-<"]
+  versions = [version for version in *versions when version_at_least RUNTIME_DOCS_EARLIEST_VERSION, version]
+  return ["#{v[1]}.#{v[2]}.#{v[3]}" for v in *versions]
+
+version_at_least = (compare_to, version) ->
+  if compare_to[1] != version[1]
+    return compare_to[1] <= version[1]
+  if compare_to[2] != version[2]
+    return compare_to[2] <= version[2]
+  if compare_to[3] != version[3]
+    return compare_to[3] <= version[3]
+  return true
+
+ensure_runtime_docs = (runtime_doc_version_list) ->
+  json_docs_dir = "#{JSON_DOCS_DIR}/runtime-api"
+  unix.mkpath json_docs_dir
+  for version in *runtime_doc_version_list
+    cached_file = "#{json_docs_dir}/#{version}.json"
+    if unix.stat cached_file
+      print "Already have cached file #{cached_file}"
+    else
+      url = "#{API_BASE}/#{version}/runtime-api.json"
+      res, code, _, status = https.request url
+      assert res, "Failed to get machine-readable runtime API doc page (#{url}), code: #{code}, status: #{status}"
+      with io.open cached_file, "w"
+        \write res
+        \close!
+
+  return
+
+main!
+return

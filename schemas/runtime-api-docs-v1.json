@@ -1,0 +1,504 @@
+{
+  "title": "Factorio machine-readable runtime API docs v1",
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "application": {
+      "type": "string",
+      "enum": ["factorio"]
+    },
+    "stage": {
+      "type": "string",
+      "enum": ["runtime"]
+    },
+    "application_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "api_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "classes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/class"
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    },
+    "defines": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/define"
+      }
+    },
+    "builtin_types": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/builtin_type"
+      }
+    },
+    "concepts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/concept"
+      }
+    },
+    "global_objects": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/global_object"
+      }
+    }
+  },
+  "required": [
+    "application",
+    "stage",
+    "application_version",
+    "api_version",
+    "classes",
+    "events",
+    "defines",
+    "builtin_types",
+    "concepts",
+    "global_objects"
+  ],
+  "$defs": {
+    "class": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "notes": { "type": "array", "items": { "type": "string" } },
+        "examples": { "type": "array", "items": { "type": "string" } },
+        "see_also": { "type": "array", "items": { "type": "string" } },
+        "methods": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/method" }
+        },
+        "attributes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/attribute" }
+        },
+        "operators": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/operator" }
+        },
+        "base_classes": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": [
+        "name",
+        "order",
+        "description",
+        "methods",
+        "attributes",
+        "operators"
+      ]
+    },
+    "method": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "notes": { "type": "array", "items": { "type": "string" } },
+        "examples": { "type": "array", "items": { "type": "string" } },
+        "see_also": { "type": "array", "items": { "type": "string" } },
+        "subclasses": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/parameter"
+          }
+        },
+        "variant_parameter_groups": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/parameter_group" }
+        },
+        "variant_parameter_description": {
+          "type": "string"
+        },
+        "variadic_type": { "$ref": "#/$defs/type" },
+        "variadic_description": { "type": "string" },
+        "takes_table": { "type": "boolean" },
+        "table_is_optional": { "type": "boolean" },
+        "return_type": { "$ref": "#/$defs/type" },
+        "return_description": { "type": "string" }
+      },
+      "required": ["name", "order", "description", "parameters", "takes_table"]
+    },
+    "parameter": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "type": { "$ref": "#/$defs/type" },
+        "optional": { "type": "boolean" }
+      },
+      "required": ["name", "order", "description", "type", "optional"]
+    },
+    "parameter_group": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "parameters": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/parameter" }
+        }
+      },
+      "required": ["name", "order", "parameters"]
+    },
+    "type": {
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["variant"]
+            },
+            "options": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/type"
+              }
+            }
+          },
+          "required": ["complex_type", "options"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["array"]
+            },
+            "value": {
+              "$ref": "#/$defs/type"
+            }
+          },
+          "required": ["complex_type", "value"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["dictionary", "LuaCustomTable"]
+            },
+            "key": {
+              "$ref": "#/$defs/type"
+            },
+            "value": {
+              "$ref": "#/$defs/type"
+            }
+          },
+          "required": ["complex_type", "key", "value"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["function"]
+            },
+            "parameters": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/type"
+              }
+            }
+          },
+          "required": ["complex_type", "parameters"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["LuaLazyLoadedValue"]
+            },
+            "value": {
+              "$ref": "#/$defs/type"
+            }
+          },
+          "required": ["complex_type", "value"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": {
+              "type": "string",
+              "enum": ["table"]
+            },
+            "parameters": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/parameter"
+              }
+            },
+            "variant_parameter_groups": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/parameter_group"
+              }
+            },
+            "variant_parameter_description": {
+              "type": "string"
+            }
+          },
+          "required": ["complex_type", "parameters"]
+        }
+      ]
+    },
+    "attribute": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "notes": { "type": "array", "items": { "type": "string" } },
+        "examples": { "type": "array", "items": { "type": "string" } },
+        "see_also": { "type": "array", "items": { "type": "string" } },
+        "subclasses": { "type": "array", "items": { "type": "string" } },
+        "type": { "$ref": "#/$defs/type" },
+        "read": { "type": "boolean" },
+        "write": { "type": "boolean" }
+      },
+      "required": ["name", "order", "description", "type", "read", "write"]
+    },
+    "operator": {
+      "allOf": [
+        {
+          "oneOf": [
+            { "$ref": "#/$defs/method" },
+            { "$ref": "#/$defs/attribute" }
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "enum": ["call", "index", "length"]
+            }
+          },
+          "required": ["name"]
+        }
+      ]
+    },
+    "event": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "notes": { "type": "array", "items": { "type": "string" } },
+        "examples": { "type": "array", "items": { "type": "string" } },
+        "see_also": { "type": "array", "items": { "type": "string" } },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/parameter"
+          }
+        }
+      },
+      "required": ["name", "order", "description", "data"]
+    },
+    "define": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "values": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/basic_member" }
+        },
+        "subkeys": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/define" }
+        }
+      },
+      "required": ["name", "order", "description"]
+    },
+    "basic_member": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" }
+      },
+      "required": ["name", "order", "description"]
+    },
+    "builtin_type": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" }
+      },
+      "required": ["name", "order", "description"]
+    },
+    "concept": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "order": { "type": "integer" },
+            "description": { "type": "string" },
+            "notes": { "type": "array", "items": { "type": "string" } },
+            "examples": { "type": "array", "items": { "type": "string" } },
+            "see_also": { "type": "array", "items": { "type": "string" } }
+          },
+          "required": ["name", "order", "description"]
+        },
+        {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string",
+                  "enum": ["table"]
+                },
+                "parameters": {
+                  "type": "array",
+                  "items": { "$ref": "#/$defs/parameter" }
+                },
+                "variant_parameter_groups": {
+                  "type": "array",
+                  "items": { "$ref": "#/$defs/parameter_group" }
+                },
+                "variant_parameter_description": {
+                  "type": "string"
+                }
+              },
+              "required": ["category", "parameters"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string",
+                  "enum": ["filter"]
+                },
+                "parameters": {
+                  "type": "array",
+                  "items": { "$ref": "#/$defs/parameter" }
+                },
+                "variant_parameter_groups": {
+                  "type": "array",
+                  "items": { "$ref": "#/$defs/parameter_group" }
+                },
+                "variant_parameter_description": {
+                  "type": "string"
+                }
+              },
+              "required": ["category", "parameters"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string",
+                  "enum": ["table_or_array"]
+                },
+                "parameters": {
+                  "type": "array",
+                  "items": { "$ref": "#/$defs/parameter" }
+                }
+              },
+              "required": ["category", "parameters"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string",
+                  "enum": ["enum", "flag"]
+                },
+                "options": {
+                  "type": "array",
+                  "items": { "$ref": "#/$defs/basic_member" }
+                }
+              },
+              "required": ["category", "options"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string",
+                  "enum": ["union"]
+                },
+                "options": {
+                  "type": "array",
+                  "items": { "$ref": "#/$defs/spec" }
+                }
+              },
+              "required": ["category", "options"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string",
+                  "enum": ["struct"]
+                },
+                "attributes": {
+                  "type": "array",
+                  "items": { "$ref": "#/$defs/attribute" }
+                }
+              },
+              "required": ["category", "attributes"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string",
+                  "enum": ["concept"]
+                }
+              },
+              "required": ["category"]
+            }
+          ]
+        }
+      ]
+    },
+    "spec": {
+      "type": "object",
+      "properties": {
+        "type": { "$ref": "#/$defs/type" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" }
+      },
+      "required": ["type", "order", "description"]
+    },
+    "global_object": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "type": { "$ref": "#/$defs/type" }
+      },
+      "required": ["name", "order", "description", "type"]
+    }
+  }
+}
