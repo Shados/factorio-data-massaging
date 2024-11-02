@@ -1,0 +1,219 @@
+{
+  "title": "Factorio machine-readable runtime API docs v2",
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "application": {
+      "type": "string",
+      "enum": ["factorio"]
+    },
+    "stage": {
+      "type": "string",
+      "enum": ["prototype"]
+    },
+    "application_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "api_version": {
+      "type": "integer",
+      "enum": [4]
+    },
+    "prototypes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/prototype" }
+    },
+    "types": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/type_concept" }
+    }
+  },
+  "required": [
+    "application",
+    "stage",
+    "application_version",
+    "api_version",
+    "prototypes",
+    "types"
+  ],
+  "$defs": {
+    "prototype": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "lists": { "type": "array", "items": { "type": "string" } },
+        "examples": { "type": "array", "items": { "type": "string" } },
+        "images": { "type": "array", "items": { "$ref": "#/$defs/image" } },
+        "parent": { "type": "string" },
+        "abstract": { "type": "boolean" },
+        "typename": { "type": "string" },
+        "instance_limit": {
+          "oneOf": [{ "type": "string" }, { "type": "integer" }]
+        },
+        "deprecated": { "type": "boolean" },
+        "properties": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/property" }
+        },
+        "custom_properties": {
+          "$ref": "#/$defs/custom_property"
+        },
+        "custom_properties_foo": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/custom_property" }
+        }
+      },
+      "required": [
+        "name",
+        "order",
+        "description",
+        "abstract",
+        "deprecated",
+        "properties"
+      ]
+    },
+    "image": {
+      "type": "object",
+      "properties": {
+        "filename": { "type": "string" },
+        "caption": {
+          "oneOf": [{ "type": "string" }, { "type": "null" }]
+        }
+      },
+      "required": ["filename"]
+    },
+    "property": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "lists": { "type": "array", "items": { "type": "string" } },
+        "examples": { "type": "array", "items": { "type": "string" } },
+        "images": { "type": "array", "items": { "$ref": "#/$defs/image" } },
+        "alt_name": { "type": "string" },
+        "override": { "type": "boolean" },
+        "type": { "$ref": "#/$defs/type" },
+        "optional": { "type": "boolean" },
+        "default": {
+          "oneOf": [{ "type": "string" }, { "$ref": "#/$defs/literal" }]
+        }
+      },
+      "required": [
+        "name",
+        "order",
+        "description",
+        "override",
+        "type",
+        "optional"
+      ]
+    },
+    "type": {
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": { "type": "string", "enum": ["array"] },
+            "value": { "$ref": "#/$defs/type" }
+          },
+          "required": ["complex_type", "value"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": { "type": "string", "enum": ["dictionary"] },
+            "key": { "$ref": "#/$defs/type" },
+            "value": { "$ref": "#/$defs/type" }
+          },
+          "required": ["complex_type", "key", "value"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": { "type": "string", "enum": ["tuple"] },
+            "values": { "type": "array", "items": { "$ref": "#/$defs/type" } }
+          },
+          "required": ["complex_type", "values"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": { "type": "string", "enum": ["union"] },
+            "options": { "type": "array", "items": { "$ref": "#/$defs/type" } },
+            "full_format": { "type": "boolean" }
+          },
+          "required": ["complex_type", "options", "full_format"]
+        },
+        {
+          "$ref": "#/$defs/literal"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": { "type": "string", "enum": ["type"] },
+            "value": { "$ref": "#/$defs/type" },
+            "description": { "type": "string" }
+          },
+          "required": ["complex_type", "value", "description"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complex_type": { "type": "string", "enum": ["struct"] }
+          },
+          "required": ["complex_type"]
+        }
+      ]
+    },
+    "literal": {
+      "type": "object",
+      "properties": {
+        "complex_type": { "type": "string", "enum": ["literal"] },
+        "value": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "number" },
+            { "type": "boolean" }
+          ]
+        },
+        "description": { "type": "string" }
+      },
+      "required": ["complex_type", "value"]
+    },
+    "custom_property": {
+      "type": "object",
+      "properties": {
+        "description": { "type": "string" },
+        "lists": { "type": "array", "items": { "type": "string" } },
+        "examples": { "type": "array", "items": { "type": "string" } },
+        "images": { "type": "array", "items": { "$ref": "#/$defs/image" } },
+        "key_type": { "$ref": "#/$defs/type" },
+        "value_type": { "$ref": "#/$defs/type" }
+      },
+      "required": ["description", "key_type", "value_type"]
+    },
+    "type_concept": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "lists": { "type": "array", "items": { "type": "string" } },
+        "examples": { "type": "array", "items": { "type": "string" } },
+        "images": { "type": "array", "items": { "$ref": "#/$defs/image" } },
+        "parent": { "type": "string" },
+        "abstract": { "type": "boolean" },
+        "inline": { "type": "boolean" },
+        "type": { "$ref": "#/$defs/type" },
+        "properties": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/property" }
+        }
+      },
+      "required": ["name", "order", "description", "abstract", "inline", "type"]
+    }
+  }
+}

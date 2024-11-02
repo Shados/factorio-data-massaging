@@ -7,26 +7,31 @@ import "unix"
 import "rapidjson"
 import "ssl.https"
 
--- "https://lua-api.factorio.com/next/runtime-api.json"
 local *
 
-API_BASE = "https://lua-api.factorio.com/"
+API_BASE = "https://lua-api.factorio.com"
 SCRIPT_DIR = do
   str = debug.getinfo(1, "S").source
   str\match "(.*)/"
 CACHE_DIR = "#{SCRIPT_DIR}/cache"
 JSON_DOCS_DIR = "#{SCRIPT_DIR}/json-docs"
-RUNTIME_DOCS_DIR = "#{SCRIPT_DIR}/json-docs/runtime-api"
+RUNTIME_DOCS_DIR = "#{JSON_DOCS_DIR}/runtime-api"
 RUNTIME_DOCS_EARLIEST_VERSION = {1, 1, 35}
+PROTOTYPE_DOCS_DIR = "#{JSON_DOCS_DIR}/prototype-api"
+PROTOTYPE_DOCS_EARLIEST_VERSION = {1, 1, 89}
 SCHEMA_DIR = "#{SCRIPT_DIR}/schemas"
 KNOWN_BUGGED_RUNTIME_DOC_VERSIONS = {
   "1.1.108": true
 }
+KNOWN_BUGGED_PROTOTYPE_DOC_VERSIONS = {
+}
 
 
 main = ->
-  runtime_doc_version_list = get_doc_versions!
-  ensure_runtime_docs runtime_doc_version_list
+  doc_version_list = get_doc_versions!
+  most_recent_version = doc_version_list[#doc_version_list]
+  ensure_docs doc_version_list
+
   parser = argparse!
   with parser
     \name "factorio-data-generation"
@@ -36,13 +41,13 @@ main = ->
     \require_command false
 
   args = parser\parse arg
-  print inspect args
+  print "args: #{inspect args}"
 
   switch args.command
     when nil
       print "no command"
     when "validate"
-      validate_json_docs runtime_doc_version_list
+      validate_json_docs doc_version_list
 
   return
 
@@ -52,24 +57,19 @@ debug_print = (...) ->
 get_doc_versions = ->
   unix.mkpath CACHE_DIR
   cached_file = "#{CACHE_DIR}/api-docs-version-list.html"
-  if unix.stat cached_file
-    print "Using cached API docs version list"
-    with io.open cached_file, "r"
-      html_str = \read "*a"
-      \close!
-      return parse_versions_html html_str
-  else
-    res, code, _, status = https.request API_BASE
-    assert res, "Failed to get documentation version list page (#{API_BASE}), code: #{code}, status: #{status}"
-    with io.open cached_file, "w"
-      \write res
-      \close!
-    return parse_versions_html res
+  ensure_url_downloaded API_BASE, cached_file
+  with io.open cached_file, "r"
+    html_str = \read "*a"
+    \close!
+    return parse_versions_html html_str
 
 parse_versions_html = (html_str) ->
   versions = [{(tonumber major), (tonumber minor), (tonumber sub)} for major, minor, sub in html_str\gmatch ">%s-(%d+)%.(%d+)%.(%d+)%s-<"]
-  versions = [version for version in *versions when version_at_least RUNTIME_DOCS_EARLIEST_VERSION, version]
-  return ["#{v[1]}.#{v[2]}.#{v[3]}" for v in *versions]
+  table.sort versions, version_sort
+  versions = for version in *versions
+    continue unless  version_at_least RUNTIME_DOCS_EARLIEST_VERSION, version
+    {:version, has_prototype_docs: version_at_least PROTOTYPE_DOCS_EARLIEST_VERSION, version}
+  return [{version: "#{v[1]}.#{v[2]}.#{v[3]}", :has_prototype_docs} for {version: v, :has_prototype_docs} in *versions]
 
 version_at_least = (compare_to, version) ->
   if compare_to[1] != version[1]
@@ -80,51 +80,88 @@ version_at_least = (compare_to, version) ->
     return compare_to[3] <= version[3]
   return true
 
-ensure_runtime_docs = (runtime_doc_version_list) ->
+version_sort = (a, b) ->
+  if a[1] != b[1]
+    return a[1] < b[1]
+  if a[2] != b[2]
+    return a[2] < b[2]
+  else
+    return a[3] < b[3]
+
+ensure_docs = (doc_version_list) ->
   unix.mkpath RUNTIME_DOCS_DIR
-  for version in *runtime_doc_version_list
-    cached_file = "#{RUNTIME_DOCS_DIR}/#{version}.json"
-    if unix.stat cached_file
-      debug_print "Already have cached file #{cached_file}"
-    else
-      url = "#{API_BASE}/#{version}/runtime-api.json"
-      res, code, _, status = https.request url
-      assert res, "Failed to get machine-readable runtime API doc page (#{url}), code: #{code}, status: #{status}"
-      with io.open cached_file, "w"
-        \write res
-        \close!
+  unix.mkpath PROTOTYPE_DOCS_DIR
+  for {:version, :has_prototype_docs} in *doc_version_list
+    cached_runtime_file = "#{RUNTIME_DOCS_DIR}/#{version}.json"
+    ensure_url_downloaded "#{API_BASE}/#{version}/runtime-api.json", cached_runtime_file
+    if has_prototype_docs
+      cached_prototype_file = "#{PROTOTYPE_DOCS_DIR}/#{version}.json"
+      ensure_url_downloaded "#{API_BASE}/#{version}/prototype-api.json", cached_prototype_file
 
   return
 
 validate_json_docs = (versions) ->
-  validators = initialise_json_schema_validators!
+  runtime_validators, prototype_validators = initialise_json_schema_validators!
   print "Validating machine-readable runtime API docs against JSON Schemas"
-  for version in *versions
+  for {:version} in *versions
     runtime_api_json = rapidjson.load "#{RUNTIME_DOCS_DIR}/#{version}.json"
-    validator = validators[runtime_api_json.api_version]
-    if validator
-      valid, err = validator runtime_api_json
+    runtime_validator = runtime_validators[runtime_api_json.api_version]
+    if runtime_validator
+      valid, err = runtime_validator runtime_api_json
       if valid
-        print "#{version}: valid"
+        print "runtime #{version}: valid"
       else
         if KNOWN_BUGGED_RUNTIME_DOC_VERSIONS[version]
-          print "#{version}: invalid: known issue, the JSON from this version is bugged, see #{SCHEMA_DIR}/runtime-api-docs-bugs.md"
+          print "runtime #{version}: invalid: known issue, the JSON from this version is bugged, see #{SCHEMA_DIR}/runtime-api-docs-bugs.md"
         else
-          print "#{version}: invalid"
+          print "runtime #{version}: invalid"
+        print err
+
+  for {:version, :has_prototype_docs} in *versions
+    continue unless has_prototype_docs
+    prototype_api_json = rapidjson.load "#{PROTOTYPE_DOCS_DIR}/#{version}.json"
+    prototype_validator = prototype_validators[prototype_api_json.api_version]
+    if prototype_validator
+      valid, err = prototype_validator prototype_api_json
+      if valid
+        print "prototype #{version}: valid"
+      else
+        if KNOWN_BUGGED_PROTOTYPE_DOC_VERSIONS[version]
+          print "prototype #{version}: invalid: known issue, the JSON from this version is bugged, see #{SCHEMA_DIR}/prototype-api-docs-bugs.md"
+        else
+          print "prototype #{version}: invalid"
         print err
 
 initialise_json_schema_validators = ->
   print "Parsing JSON Schemas"
   schema_dir, err, errno = unix.opendir SCHEMA_DIR
   assert schema_dir != nil, "Failed to open #{SCHEMA_DIR}, errno #{errno}, error: #{err}"
-  validators = {}
+  runtime_validators = {}
+  prototype_validators = {}
   for {:name} in schema_dir\files!
     version = name\match "^runtime%-api%-docs%-v(%d+)%.json$"
-    continue unless version
-    schema_json = rapidjson.load "#{SCHEMA_DIR}/#{name}"
-    validators[tonumber version] = jsonschema.generate_validator schema_json, { null: rapidjson.null }
+    if version
+      schema_json = rapidjson.load "#{SCHEMA_DIR}/#{name}"
+      runtime_validators[tonumber version] = jsonschema.generate_validator schema_json, { null: rapidjson.null }
+    else
+      version = name\match "^prototype%-api%-docs%-v(%d+)%.json$"
+      continue unless version
+      schema_json = rapidjson.load "#{SCHEMA_DIR}/#{name}"
+      prototype_validators[tonumber version] = jsonschema.generate_validator schema_json, { null: rapidjson.null }
 
-  return validators
+
+  return runtime_validators, prototype_validators
+
+ensure_url_downloaded = (url, path) ->
+  if unix.stat path
+    debug_print "Already have file downloaded at #{path}"
+  else
+    print "Fetching url #{url}"
+    res, code, _, status = https.request url
+    assert res, "Failed to fetch url (#{url}), code: #{code}, status: #{status}"
+    with io.open path, "w"
+      \write res
+      \close!
 
 main!
 return
