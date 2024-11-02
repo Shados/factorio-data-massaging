@@ -1,5 +1,5 @@
 {
-  "title": "Factorio machine-readable runtime API docs v1",
+  "title": "Factorio machine-readable runtime API docs v2",
   "$schema": "https://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
@@ -17,7 +17,7 @@
     },
     "api_version": {
       "type": "integer",
-      "enum": [1]
+      "enum": [2]
     },
     "classes": {
       "type": "array",
@@ -77,7 +77,6 @@
         "description": { "type": "string" },
         "notes": { "type": "array", "items": { "type": "string" } },
         "examples": { "type": "array", "items": { "type": "string" } },
-        "see_also": { "type": "array", "items": { "type": "string" } },
         "methods": {
           "type": "array",
           "items": { "$ref": "#/$defs/method" }
@@ -109,7 +108,10 @@
         "description": { "type": "string" },
         "notes": { "type": "array", "items": { "type": "string" } },
         "examples": { "type": "array", "items": { "type": "string" } },
-        "see_also": { "type": "array", "items": { "type": "string" } },
+        "raises": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/event_raised" }
+        },
         "subclasses": {
           "type": "array",
           "items": { "type": "string" }
@@ -131,10 +133,26 @@
         "variadic_description": { "type": "string" },
         "takes_table": { "type": "boolean" },
         "table_is_optional": { "type": "boolean" },
-        "return_type": { "$ref": "#/$defs/type" },
-        "return_description": { "type": "string" }
+        "return_values": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/return_value" }
+        }
       },
       "required": ["name", "order", "description", "parameters", "takes_table"]
+    },
+    "event_raised": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "timeframe": {
+          "type": "string",
+          "enum": ["instantly", "current_tick", "future_tick"]
+        },
+        "optional": { "type": "boolean" }
+      },
+      "required": ["name", "order", "description", "timeframe", "optional"]
     },
     "parameter": {
       "type": "object",
@@ -146,6 +164,16 @@
         "optional": { "type": "boolean" }
       },
       "required": ["name", "order", "description", "type", "optional"]
+    },
+    "return_value": {
+      "type": "object",
+      "properties": {
+        "order": { "type": "integer" },
+        "description": { "type": "string" },
+        "type": { "$ref": "#/$defs/type" },
+        "optional": { "type": "boolean" }
+      },
+      "required": ["order", "description", "type", "optional"]
     },
     "parameter_group": {
       "type": "object",
@@ -272,7 +300,10 @@
         "description": { "type": "string" },
         "notes": { "type": "array", "items": { "type": "string" } },
         "examples": { "type": "array", "items": { "type": "string" } },
-        "see_also": { "type": "array", "items": { "type": "string" } },
+        "raises": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/event_raised" }
+        },
         "subclasses": { "type": "array", "items": { "type": "string" } },
         "type": { "$ref": "#/$defs/type" },
         "read": { "type": "boolean" },
@@ -308,7 +339,6 @@
         "description": { "type": "string" },
         "notes": { "type": "array", "items": { "type": "string" } },
         "examples": { "type": "array", "items": { "type": "string" } },
-        "see_also": { "type": "array", "items": { "type": "string" } },
         "data": {
           "type": "array",
           "items": {
@@ -362,8 +392,7 @@
             "order": { "type": "integer" },
             "description": { "type": "string" },
             "notes": { "type": "array", "items": { "type": "string" } },
-            "examples": { "type": "array", "items": { "type": "string" } },
-            "see_also": { "type": "array", "items": { "type": "string" } }
+            "examples": { "type": "array", "items": { "type": "string" } }
           },
           "required": ["name", "order", "description"]
         },

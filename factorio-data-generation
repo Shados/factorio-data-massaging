@@ -1,5 +1,6 @@
 #!/usr/bin/env -S yue -e
 
+import "argparse"
 import "inspect"
 import "jsonschema"
 import "unix"
@@ -15,22 +16,37 @@ SCRIPT_DIR = do
   str\match "(.*)/"
 CACHE_DIR = "#{SCRIPT_DIR}/cache"
 JSON_DOCS_DIR = "#{SCRIPT_DIR}/json-docs"
+RUNTIME_DOCS_DIR = "#{SCRIPT_DIR}/json-docs/runtime-api"
 RUNTIME_DOCS_EARLIEST_VERSION = {1, 1, 35}
+SCHEMA_DIR = "#{SCRIPT_DIR}/schemas"
 
 main = ->
-  unix.mkpath CACHE_DIR
-  doc_version_list = get_doc_versions!
-  ensure_runtime_docs doc_version_list
+  runtime_doc_version_list = get_doc_versions!
+  ensure_runtime_docs runtime_doc_version_list
+  parser = argparse!
+  with parser
+    \name "factorio-data-generation"
+    \description "A tool for generating useful data and configuration from Factorio (meta)data files"
+    \command "validate"
+    \command_target "command"
+    \require_command false
 
-  -- runtime_api_json = rapidjson.load("runtime-api-1.1.35.json")
-  -- schema_json = rapidjson.load("schemas/runtime-api-docs-v1.json")
-  -- validator = jsonschema.generate_validator schema_json, {
-  --   null: rapidjson.null
-  -- }
-  -- print(validator runtime_api_json)
+  args = parser\parse arg
+  print inspect args
+
+  switch args.command
+    when nil
+      print "no command"
+    when "validate"
+      validate_json_docs runtime_doc_version_list
+
   return
 
+debug_print = (...) ->
+  (os.getenv "DEBUG") and print(...)
+
 get_doc_versions = ->
+  unix.mkpath CACHE_DIR
   cached_file = "#{CACHE_DIR}/api-docs-version-list.html"
   if unix.stat cached_file
     print "Using cached API docs version list"
@@ -61,12 +77,11 @@ version_at_least = (compare_to, version) ->
   return true
 
 ensure_runtime_docs = (runtime_doc_version_list) ->
-  json_docs_dir = "#{JSON_DOCS_DIR}/runtime-api"
-  unix.mkpath json_docs_dir
+  unix.mkpath RUNTIME_DOCS_DIR
   for version in *runtime_doc_version_list
-    cached_file = "#{json_docs_dir}/#{version}.json"
+    cached_file = "#{RUNTIME_DOCS_DIR}/#{version}.json"
     if unix.stat cached_file
-      print "Already have cached file #{cached_file}"
+      debug_print "Already have cached file #{cached_file}"
     else
       url = "#{API_BASE}/#{version}/runtime-api.json"
       res, code, _, status = https.request url
@@ -76,6 +91,33 @@ ensure_runtime_docs = (runtime_doc_version_list) ->
         \close!
 
   return
+
+validate_json_docs = (versions) ->
+  validators = initialise_json_schema_validators!
+  print "Validating machine-readable runtime API docs against JSON Schemas"
+  for version in *versions
+    runtime_api_json = rapidjson.load "#{RUNTIME_DOCS_DIR}/#{version}.json"
+    validator = validators[runtime_api_json.api_version]
+    if validator
+      valid, err = validator runtime_api_json
+      if valid
+        print "#{version}: valid"
+      else
+        print "#{version}: invalid\n#{err}"
+
+initialise_json_schema_validators = ->
+  print "Parsing JSON Schemas"
+  schema_dir, err, errno = unix.opendir SCHEMA_DIR
+  assert schema_dir != nil, "Failed to open #{SCHEMA_DIR}, errno #{errno}, error: #{err}"
+  validators = {}
+  for {:name} in schema_dir\files!
+    --                   " runtime-api-docs-v1.json"
+    version = name\match "^runtime%-api%-docs%-v(%d+)%.json$"
+    continue unless version
+    schema_json = rapidjson.load "#{SCHEMA_DIR}/#{name}"
+    validators[tonumber version] = jsonschema.generate_validator schema_json, { null: rapidjson.null }
+
+  return validators
 
 main!
 return
