@@ -1,0 +1,8 @@
+{
+    "library": "production-score",
+    "new_globals": {},
+    "loaded_module_names": [
+        "production_score.generate_price_list",
+        "production_score.get_production_scores"
+    ]
+}

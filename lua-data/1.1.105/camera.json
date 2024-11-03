@@ -1,0 +1,12 @@
+{
+    "library": "camera",
+    "new_globals": {},
+    "loaded_module_names": [
+        "camera.follow",
+        "camera.hold",
+        "camera.idle",
+        "camera.init",
+        "camera.move",
+        "camera.update"
+    ]
+}

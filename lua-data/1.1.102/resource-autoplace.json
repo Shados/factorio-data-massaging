@@ -1,0 +1,20 @@
+{
+    "library": "resource-autoplace",
+    "new_globals": [
+        "resource_autoplace__patch_metasets",
+        "resource_autoplace__patch_metasets.regular",
+        "resource_autoplace__patch_metasets.regular.count_expression_name",
+        "resource_autoplace__patch_metasets.regular.get_patch_set_index",
+        "resource_autoplace__patch_metasets.regular.next_patch_set_index",
+        "resource_autoplace__patch_metasets.regular.patch_set_indexes",
+        "resource_autoplace__patch_metasets.starting",
+        "resource_autoplace__patch_metasets.starting.count_expression_name",
+        "resource_autoplace__patch_metasets.starting.get_patch_set_index",
+        "resource_autoplace__patch_metasets.starting.next_patch_set_index",
+        "resource_autoplace__patch_metasets.starting.patch_set_indexes"
+    ],
+    "loaded_module_names": [
+        "resource_autoplace.initialize_patch_set",
+        "resource_autoplace.resource_autoplace_settings"
+    ]
+}

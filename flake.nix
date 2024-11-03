@@ -27,12 +27,14 @@
         gnumake
         inotifyTools
         jsonschema
+        git gnutar
       ]) ++ (with pkgs.lua52Packages; [
         lua luarepl yuescript
-        argparse inspect rapidjson jsonschema luasec lunix
+        luacheck
+        argparse inspect rapidjson jsonschema luasec lunix serpent compat53
       ]);
       shellHook = ''
-        export LUA_PATH="${toString ./.}/lua/?.lua;''${LUA_PATH}"
+        export LUA_PATH="$PWD/?.lua;$PWD/?/init.lua''${LUA_PATH}"
       '';
     };
   });

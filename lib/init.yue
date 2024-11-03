@@ -1,0 +1,89 @@
+import "unix"
+
+local *
+
+deep_copy = (t, _seen={}) ->
+  res = {}
+  _seen[t] = res
+  for k, v in pairs t
+    if (type v) == "table"
+      res[k] = _seen[v] or deep_copy(v, _seen)
+    else
+      res[k] = v
+  return res
+
+
+lsdir = (path) ->
+  dir, err, errno = unix.opendir path
+  assert dir != nil, "Failed to open #{path}, errno #{errno}, error: #{err}"
+  children = {}
+  for {:name} in dir\files!
+    continue if name == "." or name == ".."
+    children[]= name
+  dir\close!
+  return children
+
+
+run_cmd = (cmd) ->
+  ok, status, num = os.execute cmd
+  assert ok, "Failed to run `#{cmd}`, #{status}, #{num}"
+
+
+split_string = (str, delimiter) ->
+  -- Yes, we really do start the indexes at 0; this is because we're working
+  -- with #str and str\sub, *not* indexing a table
+  collected = {}
+  previous_index = 0
+
+  for current_index = 0, #str
+    current_char = str\sub current_index, current_index
+    is_delimiter = current_char == delimiter
+
+    -- If we're at a delimiter, we need to append to the list of collected
+    -- substrings
+    if is_delimiter
+      table.insert collected, str\sub previous_index, current_index - 1
+
+      -- Update the previous_index value to point to just after this delimiter
+      previous_index = current_index + 1
+
+    -- We're done with the loop and need to return an actual value
+    if current_index == #str
+      if is_delimiter
+        -- In the case of ending on a delimiter, we need a trailing empty
+        -- string in order to be able to re-create the original str via a
+        -- theoretical join(collected, ".") function - in order to be
+        -- reversible, that is
+        table.insert collected, ""
+      else
+        -- Otherwise, just add the current substring
+        table.insert collected, str\sub previous_index, current_index
+      return collected
+
+xdg_home_default = (dir_type) ->
+  var = "XDG_#{dir_type\upper!}_HOME"
+  suffix = switch dir_type
+    when "data"
+      ".local/share"
+    when "config"
+      ".config"
+    when "state"
+      ".local/state"
+    when "cache"
+      ".cache"
+    else
+      error "Unknown XDG home directory #{var}"
+
+  if env := os.getenv var
+    return env
+
+  if home_env := os.getenv "HOME"
+    return "#{home_env}/#{suffix}"
+
+  uid = unix.getuid!
+  if home := unix.getpwuid uid, "dir"
+    return "#{home}/#{suffix}"
+
+  error "Couldn't determine appropriate path for #{var} directory, try setting the environment variable"
+
+{ :deep_copy, :lsdir, :run_cmd, :split_string, :xdg_home_default }

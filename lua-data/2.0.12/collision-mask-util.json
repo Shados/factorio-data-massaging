@@ -1,0 +1,16 @@
+{
+    "library": "collision-mask-util",
+    "new_globals": {},
+    "loaded_module_names": [
+        "collision_mask_util.collect_prototypes_colliding_with_mask",
+        "collision_mask_util.collect_prototypes_with_layer",
+        "collision_mask_util.collect_prototypes_with_mask",
+        "collision_mask_util.get_default_mask",
+        "collision_mask_util.get_mask",
+        "collision_mask_util.masks_are_same",
+        "collision_mask_util.masks_collide",
+        "collision_mask_util.migrate_from_before_1_2_0",
+        "collision_mask_util.new_mask",
+        "collision_mask_util.replace_layer_in_all_prototypes"
+    ]
+}

@@ -1,0 +1,30 @@
+{
+    "library": "math2d",
+    "new_globals": {},
+    "loaded_module_names": [
+        "math2d.bounding_box",
+        "math2d.bounding_box.collides_with",
+        "math2d.bounding_box.contains_box",
+        "math2d.bounding_box.contains_point",
+        "math2d.bounding_box.create_from_centre",
+        "math2d.bounding_box.ensure_xy",
+        "math2d.bounding_box.get_centre",
+        "math2d.position",
+        "math2d.position.add",
+        "math2d.position.distance",
+        "math2d.position.distance_squared",
+        "math2d.position.divide_scalar",
+        "math2d.position.ensure_xy",
+        "math2d.position.get_normalised",
+        "math2d.position.multiply_scalar",
+        "math2d.position.rotate_vector",
+        "math2d.position.subtract",
+        "math2d.position.vector_length",
+        "math2d.projection_constant",
+        "math2d.vector",
+        "math2d.vector.from_orientation",
+        "math2d.vector.length",
+        "math2d.vector.projected",
+        "math2d.vector.to_orientation"
+    ]
+}

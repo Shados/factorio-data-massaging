@@ -1,0 +1,8 @@
+{
+    "library": "biome-visualization-utils",
+    "new_globals": {},
+    "loaded_module_names": [
+        "biome_visualization_utils.log_rectangle",
+        "biome_visualization_utils.rectangle_logging_enabled"
+    ]
+}

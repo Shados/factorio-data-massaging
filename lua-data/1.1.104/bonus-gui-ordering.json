@@ -1,0 +1,30 @@
+{
+    "library": "bonus-gui-ordering",
+    "new_globals": [
+        "bonus_gui_ordering",
+        "bonus_gui_ordering.artillery-shell",
+        "bonus_gui_ordering.artillery_range",
+        "bonus_gui_ordering.beam",
+        "bonus_gui_ordering.biological",
+        "bonus_gui_ordering.bullet",
+        "bonus_gui_ordering.cannon-shell",
+        "bonus_gui_ordering.capsule",
+        "bonus_gui_ordering.character",
+        "bonus_gui_ordering.electric",
+        "bonus_gui_ordering.flamethrower",
+        "bonus_gui_ordering.follower_robots",
+        "bonus_gui_ordering.grenade",
+        "bonus_gui_ordering.inserter",
+        "bonus_gui_ordering.landmine",
+        "bonus_gui_ordering.laser",
+        "bonus_gui_ordering.melee",
+        "bonus_gui_ordering.mining_productivity",
+        "bonus_gui_ordering.research_speed",
+        "bonus_gui_ordering.rocket",
+        "bonus_gui_ordering.shotgun-shell",
+        "bonus_gui_ordering.stack_inserter",
+        "bonus_gui_ordering.train_braking_force",
+        "bonus_gui_ordering.turret_attack",
+        "bonus_gui_ordering.worker_robots"
+    ]
+}

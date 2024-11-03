@@ -1,0 +1,18 @@
+{
+    "library": "meld",
+    "new_globals": {},
+    "loaded_module_names": [
+        "meld.__call",
+        "meld.append",
+        "meld.control_handlers",
+        "meld.control_handlers.append",
+        "meld.control_handlers.delete",
+        "meld.control_handlers.invoke",
+        "meld.control_handlers.overwrite",
+        "meld.control_marker",
+        "meld.delete",
+        "meld.invoke",
+        "meld.meld",
+        "meld.overwrite"
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "library": "mod-gui",
+    "new_globals": {},
+    "loaded_module_names": [
+        "mod_gui.button_style",
+        "mod_gui.frame_style",
+        "mod_gui.get_button_flow",
+        "mod_gui.get_frame_flow"
+    ]
+}
