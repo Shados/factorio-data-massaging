@@ -1,0 +1,412 @@
+no_children = {}
+
+-- Functionally, a dump of luacheck's lua52c standard -- see note at point of usage
+STD_LUACHECK_LUA52C = {
+  read_globals: {
+    _ENV: {
+      other_fields: true,
+      read_only: false
+    },
+    _G: {
+      other_fields: true,
+      read_only: false
+    },
+    _VERSION: {
+      fields: {
+        byte: no_children,
+        char: no_children,
+        dump: no_children,
+        find: no_children,
+        format: no_children,
+        gmatch: no_children,
+        gsub: no_children,
+        len: no_children,
+        lower: no_children,
+        match: no_children,
+        rep: no_children,
+        reverse: no_children,
+        sub: no_children,
+        upper: no_children
+      }
+    },
+    arg: {
+      other_fields: true
+    },
+    assert: no_children,
+    bit32: {
+      fields: {
+        arshift: no_children,
+        band: no_children,
+        bnot: no_children,
+        bor: no_children,
+        btest: no_children,
+        bxor: no_children,
+        extract: no_children,
+        lrotate: no_children,
+        lshift: no_children,
+        replace: no_children,
+        rrotate: no_children,
+        rshift: no_children
+      }
+    },
+    collectgarbage: no_children,
+    coroutine: {
+      fields: {
+        create: no_children,
+        resume: no_children,
+        running: no_children,
+        status: no_children,
+        wrap: no_children,
+        yield: no_children
+      }
+    },
+    debug: {
+      fields: {
+        debug: no_children,
+        gethook: no_children,
+        getinfo: no_children,
+        getlocal: no_children,
+        getmetatable: no_children,
+        getregistry: no_children,
+        getupvalue: no_children,
+        getuservalue: no_children,
+        sethook: no_children,
+        setlocal: no_children,
+        setmetatable: no_children,
+        setupvalue: no_children,
+        setuservalue: no_children,
+        traceback: no_children,
+        upvalueid: no_children,
+        upvaluejoin: no_children
+      }
+    },
+    dofile: no_children,
+    error: no_children,
+    getmetatable: no_children,
+    io: {
+      fields: {
+        close: no_children,
+        flush: no_children,
+        input: no_children,
+        lines: no_children,
+        open: no_children,
+        output: no_children,
+        popen: no_children,
+        read: no_children,
+        stderr: {
+          fields: {
+            __gc: no_children,
+            __index: {
+              other_fields: true
+            },
+            __tostring: no_children,
+            close: no_children,
+            flush: no_children,
+            lines: no_children,
+            read: no_children,
+            seek: no_children,
+            setvbuf: no_children,
+            write: no_children
+          }
+        },
+        stdin: {
+          fields: {
+            __gc: no_children,
+            __index: {
+              other_fields: true
+            },
+            __tostring: no_children,
+            close: no_children,
+            flush: no_children,
+            lines: no_children,
+            read: no_children,
+            seek: no_children,
+            setvbuf: no_children,
+            write: no_children
+          }
+        },
+        stdout: {
+          fields: {
+            __gc: no_children,
+            __index: {
+              other_fields: true
+            },
+            __tostring: no_children,
+            close: no_children,
+            flush: no_children,
+            lines: no_children,
+            read: no_children,
+            seek: no_children,
+            setvbuf: no_children,
+            write: no_children
+          }
+        },
+        tmpfile: no_children,
+        type: no_children,
+        write: no_children
+      }
+    },
+    ipairs: no_children,
+    load: no_children,
+    loadfile: no_children,
+    loadstring: no_children,
+    math: {
+      fields: {
+        abs: no_children,
+        acos: no_children,
+        asin: no_children,
+        atan: no_children,
+        atan2: no_children,
+        ceil: no_children,
+        cos: no_children,
+        cosh: no_children,
+        deg: no_children,
+        exp: no_children,
+        floor: no_children,
+        fmod: no_children,
+        frexp: no_children,
+        huge: no_children,
+        ldexp: no_children,
+        log: no_children,
+        log10: no_children,
+        max: no_children,
+        min: no_children,
+        modf: no_children,
+        pi: no_children,
+        pow: no_children,
+        rad: no_children,
+        random: no_children,
+        randomseed: no_children,
+        sin: no_children,
+        sinh: no_children,
+        sqrt: no_children,
+        tan: no_children,
+        tanh: no_children
+      }
+    },
+    module: no_children,
+    next: no_children,
+    os: {
+      fields: {
+        clock: no_children,
+        date: no_children,
+        difftime: no_children,
+        execute: no_children,
+        exit: no_children,
+        getenv: no_children,
+        remove: no_children,
+        rename: no_children,
+        setlocale: no_children,
+        time: no_children,
+        tmpname: no_children
+      }
+    },
+    package: {
+      fields: {
+        config: {
+          fields: {
+            byte: no_children,
+            char: no_children,
+            dump: no_children,
+            find: no_children,
+            format: no_children,
+            gmatch: no_children,
+            gsub: no_children,
+            len: no_children,
+            lower: no_children,
+            match: no_children,
+            rep: no_children,
+            reverse: no_children,
+            sub: no_children,
+            upper: no_children
+          }
+        },
+        cpath: {
+          fields: {
+            byte: no_children,
+            char: no_children,
+            dump: no_children,
+            find: no_children,
+            format: no_children,
+            gmatch: no_children,
+            gsub: no_children,
+            len: no_children,
+            lower: no_children,
+            match: no_children,
+            rep: no_children,
+            reverse: no_children,
+            sub: no_children,
+            upper: no_children
+          },
+          read_only: false
+        },
+        loaded: {
+          other_fields: true,
+          read_only: false
+        },
+        loaders: {
+          other_fields: true,
+          read_only: false
+        },
+        loadlib: no_children,
+        path: {
+          fields: {
+            byte: no_children,
+            char: no_children,
+            dump: no_children,
+            find: no_children,
+            format: no_children,
+            gmatch: no_children,
+            gsub: no_children,
+            len: no_children,
+            lower: no_children,
+            match: no_children,
+            rep: no_children,
+            reverse: no_children,
+            sub: no_children,
+            upper: no_children
+          },
+          read_only: false
+        },
+        preload: {
+          other_fields: true,
+          read_only: false
+        },
+        seeall: no_children,
+        searchers: {
+          other_fields: true,
+          read_only: false
+        },
+        searchpath: no_children
+      }
+    },
+    pairs: no_children,
+    pcall: no_children,
+    print: no_children,
+    rawequal: no_children,
+    rawget: no_children,
+    rawlen: no_children,
+    rawset: no_children,
+    require: no_children,
+    select: no_children,
+    setmetatable: no_children,
+    string: {
+      fields: {
+        byte: no_children,
+        char: no_children,
+        dump: no_children,
+        find: no_children,
+        format: no_children,
+        gmatch: no_children,
+        gsub: no_children,
+        len: no_children,
+        lower: no_children,
+        match: no_children,
+        rep: no_children,
+        reverse: no_children,
+        sub: no_children,
+        upper: no_children
+      }
+    },
+    table: {
+      fields: {
+        concat: no_children,
+        insert: no_children,
+        maxn: no_children,
+        pack: no_children,
+        remove: no_children,
+        sort: no_children,
+        unpack: no_children
+      }
+    },
+    tonumber: no_children,
+    tostring: no_children,
+    type: no_children,
+    unpack: no_children,
+    xpcall: no_children
+  }
+}
+
+INSTRUMENT_MODE_REMOVED_LUA_GLOBALS = {
+  "coroutine"
+  "dofile"
+  "io"
+  "loadfile"
+  "os"
+  -- Everything but package.loaded
+  "package.config"
+  "package.cpath"
+  "package.loadlib"
+  "package.path"
+  "package.preload"
+  "package.searchers"
+  "package.searchpath"
+  -- From Lua 5.2's LUA_COMPAT_ALL, which Factorio appears to be using, and is the base luacheck standard we build from
+  "package.seeall"
+}
+REMOVED_LUA_GLOBALS = {
+  ...INSTRUMENT_MODE_REMOVED_LUA_GLOBALS
+  -- Only getinfo() and traceback() left in debug by default
+  "debug.debug"
+  "debug.gethook"
+  "debug.getlocal"
+  "debug.getmetatable"
+  "debug.getregistry"
+  "debug.getupvalue"
+  "debug.getuservalue"
+  "debug.sethook"
+  "debug.setlocal"
+  "debug.setmetatable"
+  "debug.setupvalue"
+  "debug.setuservalue"
+  "debug.upvalueid"
+  "debug.upvaluejoin"
+}
+-- Don't know why these aren't mentioned in the API doc JSON files; they *could* be
+ADDED_LUA_GLOBALS = {
+  "serpent._COPYRIGHT"
+  "serpent._DESCRIPTION"
+  "serpent._NAME"
+  "serpent._VERSION"
+  "serpent.block"
+  "serpent.dump"
+  "serpent.line"
+  "serpent.load"
+  "serpent.serialize"
+  "string.pack"
+  "string.packsize"
+  "string.unpack"
+  -- Undocumented, appears to be a `pairs`-iterating version of `table.concat`,
+  -- but implemented on the C/++ side?
+  "table.pairs_concat"
+}
+INSTRUMENT_MODE_LUA_GLOBALS = {
+  "on_error"
+}
+PROTOTYPE_LUA_GLOBALS = {
+  "data.raw"
+  "data.extend"
+  "data.is_demo"
+  "mods"
+  "settings.startup"
+}
+-- Overrides for luacheckrc that cannot be (correctly) determined from the API
+-- JSON docs
+PROTOTYPE_LUA_READ_ONLY_INDEXABLE_GLOBALS = {
+  "settings.startup"
+}
+PROTOTYPE_LUA_WRITE_INDEXABLE_GLOBALS = {
+  "data.raw"
+}
+RUNTIME_LUA_READ_ONLY_INDEXABLE_GLOBALS = {
+  "settings.startup"
+}
+
+return {
+  :ADDED_LUA_GLOBALS
+  :INSTRUMENT_MODE_LUA_GLOBALS
+  :INSTRUMENT_MODE_REMOVED_LUA_GLOBALS
+  :PROTOTYPE_LUA_GLOBALS
+  :REMOVED_LUA_GLOBALS
+  :STD_LUACHECK_LUA52C
+}

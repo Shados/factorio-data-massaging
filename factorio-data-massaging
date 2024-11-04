@@ -6,7 +6,8 @@ import "unix"
 import "rapidjson"
 import "serpent"
 import "ssl.https"
-import "lib" as :deep_copy, :lsdir, :run_cmd, :split_string, :xdg_home_default
+import "lib" as :array_join, :table_deep_copy, :lsdir, :run_cmd, :string_split, :table_get_path, :table_insert_path, :table_shallow_copy, :xdg_home_default
+import "lib.luacheck" as :ADDED_LUA_GLOBALS, :INSTRUMENT_MODE_LUA_GLOBALS, :INSTRUMENT_MODE_REMOVED_GLOBALS, :PROTOTYPE_LUA_GLOBALS, :REMOVED_LUA_GLOBALS, :STD_LUACHECK_LUA52C
 
 local *
 
@@ -30,39 +31,6 @@ KNOWN_BUGGED_RUNTIME_DOC_VERSIONS = {
 }
 KNOWN_BUGGED_PROTOTYPE_DOC_VERSIONS = {
 }
-INSTRUMENT_MODE_REMOVED_LUA_GLOBALS = {
-  "coroutine"
-  "dofile"
-  "io"
-  "loadfile"
-  "os"
-  -- Everything but package.loaded
-  "package.config"
-  "package.cpath"
-  "package.loadlib"
-  "package.path"
-  "package.preload"
-  "package.searchers"
-  "package.searchpath"
-}
-REMOVED_LUA_GLOBALS = {
-  ...INSTRUMENT_MODE_REMOVED_LUA_GLOBALS
-  -- Only getinfo() and traceback() left in debug by default
-  "debug.debug"
-  "debug.gethook"
-  "debug.getlocal"
-  "debug.getmetatable"
-  "debug.getregistry"
-  "debug.getupvalue"
-  "debug.getuservalue"
-  "debug.sethook"
-  "debug.setlocal"
-  "debug.setmetatable"
-  "debug.setupvalue"
-  "debug.setuservalue"
-  "debug.upvalueid"
-  "debug.upvaluejoin"
-}
 -- Some of the core mod's lualibs don't properly require() one another, we
 -- document the missing entries here so we can properly lift values from them
 -- in lift_core_lualib().
@@ -75,48 +43,20 @@ CORE_MOD_LUALIB_CANNOT_REQUIRE = {
   "circuit-connector-generated-definitions": true
   "builder": true
 }
--- Don't know why these aren't mentioned in the API doc JSON files; they *could* be
-ADDED_LUA_GLOBALS = {
-  "storage" -- nee `global`
-  "serpent._COPYRIGHT"
-  "serpent._DESCRIPTION"
-  "serpent._NAME"
-  "serpent._VERSION"
-  "serpent.block"
-  "serpent.dump"
-  "serpent.line"
-  "serpent.load"
-  "serpent.serialize"
-  "string.pack"
-  "string.packsize"
-  "string.unpack"
-  -- Undocumented, appears to be a `pairs`-iterating version of `table.concat`,
-  -- but implemented on the C/++ side?
-  "table.pairs_concat"
-  -- Things deprecated in Lua 5.2 but still present -- TODO confirm these aren't in luacheck's 5.2 std?
-  "loadstring" -- Here it is just an alias for load
-  "table.maxn"
-  "unpack" -- Alias for table.unpack
-}
-INSTRUMENT_MODE_LUA_GLOBALS = {
-  "on_error"
-}
-PROTOTYPE_LUA_GLOBALS = {
-  "data"
-  "data.raw"
-  "data.extend"
-  "data.is_demo"
-  "mods"
-  "settings.startup"
-  -- Exists
-  "feature_flags"
-}
 PROTOTYPE_LOADED_LUALIBS = {
   "util"
   "bonus-gui-ordering"
   "sound-util"
 }
-
+STORAGE_RENAME_FIRST_VERSION = { 2, 0, 0 }
+WRITEABLE_GLOBALS = {
+  "data.raw"
+  "global"
+  "storage"
+  "settings.global"
+  "settings.player_default"
+}
+WRITEABLE_GLOBALS = {g, true for g in *WRITEABLE_GLOBALS}
 
 main = ->
   doc_version_list = get_doc_versions!
@@ -195,6 +135,12 @@ version_sort = (a, b) ->
     return a[3] < b[3]
 
 
+version_parse = (ver_str) ->
+  {major, minor, sub} = {ver_str\match "^(%d+)%.(%d+)%.(%d+)$"}
+  assert major != nil, "Couldn't parse as version: '#{ver_str}'"
+  {(tonumber major), (tonumber minor), (tonumber sub)}
+
+
 ensure_docs = (doc_version_list) ->
   unix.mkpath RUNTIME_DOCS_DIR
   unix.mkpath PROTOTYPE_DOCS_DIR
@@ -221,7 +167,7 @@ ensure_factorio_data = () ->
   cmd = "git -C #{FACTORIO_DATA_REPO_DIR} --no-pager tag --list"
   tag_fd = io.popen cmd, "r"
   versions = tag_fd\read "*a"
-  versions = split_string versions, "\n"
+  versions = string_split versions, "\n"
   table.remove versions -- Remove trailing newline
 
   for version in *versions
@@ -280,7 +226,7 @@ extract_core_lualibs = (version) ->
 
     baseline_global_env = if early_lib_set[library]
       -- Load the early lib without loading data stage, compare against no-data baseline
-      deep_copy(sandbox_env)
+      table_deep_copy(sandbox_env)
     else
       data_stage_code_str = [[
       require("data.lua") -- Run the data stage for the core mod, ish
@@ -290,7 +236,7 @@ extract_core_lualibs = (version) ->
       sandbox_run, err = load data_stage_code_str, "factorio-data-generation.sandbox", "t", sandbox_env
       assert sandbox_run, err
 
-      deep_copy(sandbox_run!)
+      table_deep_copy(sandbox_run!)
 
     code_str = sandboxed_lualib_code_str library
 
@@ -370,6 +316,8 @@ extract_table_namespace = (t, prefix="") ->
   return names
 
 -- Prepare a sandboxed environment similar to Factorio's own
+-- Technically we should be using Lua 5.2 w/ LUA_COMPAT_ALL, but in practice it
+-- does not seem to matter.
 setup_sandbox_env = (runtime_api_json, data_dir) ->
   stage_globals = build_runtime_globals runtime_api_json
   sandbox_env = {
@@ -439,12 +387,12 @@ setup_sandbox_env = (runtime_api_json, data_dir) ->
   sandbox_env.loadstring = sandbox_env.load
   sandbox_env.serpent = require "serpent"
   sandbox_env.storage = {}
-  sandbox_env.string = {k, v for k,v in pairs string}
+  sandbox_env.string = table_shallow_copy string
   compat53 = require "compat53.module"
   sandbox_env.string.pack = compat53.string.pack
   sandbox_env.string.packsize = compat53.string.packsize
   sandbox_env.string.unpack = compat53.string.unpack
-  sandbox_env.table = {k, v for k,v in pairs table}
+  sandbox_env.table = table_shallow_copy table
   isinteger = (n) ->
     assert type n == "number", "isinteger only takes numerical values as input, not: #{n}"
     {_, fractional} = math.modf n
@@ -497,7 +445,7 @@ setup_sandbox_env = (runtime_api_json, data_dir) ->
 
 
 -- Stub just enough of the runtime global variables and functions that we can
--- load Factorio's lualibs
+-- load Factorio's lualibs and dump their structure
 build_runtime_globals = (runtime_api_json) ->
   defines = build_lua_defines runtime_api_json.defines
   globals = { :defines }
@@ -519,13 +467,13 @@ build_runtime_globals = (runtime_api_json) ->
           error "Have not written an implementation for global_function #{name}"
 
   classes = {}
-  for klass_attr in *runtime_api_json.classes
-    {:name, :methods, :attributes, :operators} = klass_attr
-    klass = {}
+  for class_attr in *runtime_api_json.classes
+    {:name, :methods, :attributes, :operators} = class_attr
+    class_ = {}
     for method in *methods
-      klass[method.name] = -> nil
+      class_[method.name] = -> nil
     for attribute in *attributes
-      klass[attribute.name] = {}
+      class_[attribute.name] = {}
     mt = {}
     has_ops = false
     for operator in *operators
@@ -542,8 +490,8 @@ build_runtime_globals = (runtime_api_json) ->
         else
           error "Have not written an implementation for operator #{operator.name}"
     if has_ops
-      setmetatable klass, mt
-    classes[name] = klass
+      setmetatable class_, mt
+    classes[name] = class_
 
   for obj in *runtime_api_json.global_objects
     globals[obj.name] = classes[obj.type]
@@ -570,35 +518,29 @@ build_lua_defines = (defines_json) ->
       lua_defines[name] = 1
   return lua_defines
 
-build_prototype_globals = () ->
-  -- TODO?
-  error "unimplemented"
-
 
 generate_luacheckrc_files = (versions) ->
-  version = versions[#versions].version
+  version = versions[#versions].version -- TODO multiple versions
   runtime_api_json = rapidjson.load "#{RUNTIME_DOCS_DIR}/#{version}.json"
   prototype_api_json = rapidjson.load "#{PROTOTYPE_DOCS_DIR}/#{version}.json"
-  -- lualib_json = {}
-  -- children = lsdir lualib_dir
-  -- for child in *children
-  --   lualib_json[child] = rapidjson.load "#{lualib_dir}/#{child}"
 
-  lualib_dir = "#{LUA_DATA_DIR}/#{version}"
-  lualib_data_stage_globals = {}
   -- Include core-mod's `util`, `bonus-gui-ordering`, and `sound-util`
   -- libraries as part of the accessible globals during the prototype stage, as
   -- these are loaded by the core-mod at that point, and the prototype stage
   -- uses a single shared Lua state for all mods.
-  for lib in *PROTOTYPE_LOADED_LUALIBS
-    lualib_json = rapidjson.load "#{lualib_dir}/#{lib}.json"
-    for path in *lualib_json.new_globals
-      lualib_data_stage_globals[path] = true
-  lualib_data_stage_globals = [k for k, _ in pairs lualib_data_stage_globals]
+  lualibs_set = {lib, true for lib in *PROTOTYPE_LOADED_LUALIBS}
+  lualib_data_stage_globals = populate_lualib_globals version, lualibs_set
 
-  data_stage_defines = extract_defines_namespace prototype_api_json.defines, "defines."
+  -- These may well be identical, haven't actually checked
+  data_stage_defines = extract_luacheckrc_defines prototype_api_json
+  runtime_stage_defines = extract_luacheckrc_defines runtime_api_json
 
-  -- Populate the feature_flags mapping, if present TODO replace with pattern match on runtime flags instead?
+  runtime_stage_dynamic_globals = extract_luacheckrc_json_api_globals runtime_api_json
+  -- runtime_stage_dynamic_globals = extract_json_api_globals version, runtime_api_json
+  print serpent.block runtime_stage_dynamic_globals
+  os.exit 1
+
+  -- Populate the feature_flags mapping, if present
   feature_flags = {}
   for {:name, :attributes} in *runtime_api_json.classes
     continue if name != "LuaBootstrap"
@@ -607,41 +549,201 @@ generate_luacheckrc_files = (versions) ->
       flag_names = ["feature_flags.#{name}" for {:name} in *attribute.read_type.parameters]
       feature_flags = flag_names
 
-  data_stage_globals = {
-    "data.raw"
-    "data.extend"
-    "data.is_demo"
-  }
-
   data_stage_new_globals = {
+    ...ADDED_LUA_GLOBALS
+    ...PROTOTYPE_LUA_GLOBALS
     ...feature_flags
     ...data_stage_defines
-    ...data_stage_globals
     ...lualib_data_stage_globals
   }
-
   table.sort data_stage_new_globals
-  print serpent.block data_stage_new_globals
 
+  runtime_stage_new_globals = {
+    ...ADDED_LUA_GLOBALS
+    ...runtime_stage_defines
+    ...runtime_stage_dynamic_globals
+  }
+  table.sort runtime_stage_new_globals
+
+  global_paths_to_luacheckrc_definitions runtime_stage_new_globals
+  os.exit 1
+  io.write "runtime_stage_new_global = "
+  print serpent.serialize runtime_stage_new_globals, {}
   -- Get set of globals added by Factorio
   -- TODO set luacheck base std option to lua 5.2
   error("unimplemented")
 
 
-extract_defines_namespace = (defines_json, prefix="") ->
-  names = {}
-  for {:name, :values, :subkeys} in *defines_json
+populate_lualib_globals = (version, filter=nil) ->
+  lualib_dir = "#{LUA_DATA_DIR}/#{version}"
+  lualib_globals = {}
+  -- Include core-mod's `util`, `bonus-gui-ordering`, and `sound-util`
+  -- libraries as part of the accessible globals during the prototype stage, as
+  -- these are loaded by the core-mod at that point, and the prototype stage
+  -- uses a single shared Lua state for all mods.
+  lualibs = {}
+  lib_dir_files = lsdir lualib_dir
+  for child_path in *lib_dir_files
+    libname = child_path\match "^(.+)%.json$"
+    continue unless libname
+    continue if filter[libname]
+    lualibs[]= libname
+    lualib_json = rapidjson.load "#{lualib_dir}/#{libname}.json"
+    for path in *lualib_json.new_globals
+      lualib_globals[path] = true
+  lualib_globals = strip_lax_globals lualibs, lualib_globals
+  lualib_globals = [k for k, _ in pairs lualib_globals]
+  return lualib_globals
+
+
+-- Remove entries for the libraries/global objects themselves, if they have any
+-- children, e.g. `util` but not `util.mul_shift` or `tons`
+strip_lax_globals = (bases, globals_set) ->
+  -- Convert names appropriately
+  bases = [base\gsub "-", "_" for base in *bases]
+  has_children = {}
+  for global_path, _ in pairs globals_set
+    for lib in *bases
+      continue if has_children[lib]
+      if global_path\match "^#{lib}%."
+        has_children[lib] = true
+
+  return {lib, v for lib, v in pairs globals_set when has_children[lib] != true}
+
+
+extract_luacheckrc_defines = (api_json) ->
+  processing = [{define, {"read_globals", "defines", "fields"}} for define in *api_json.defines]
+  defines_luacheckrc = {}
+  while next_ := table.remove processing
+    {define, path} = next_
+    {:name, :values, :subkeys} = define
+    table.insert path, name
+    table_insert_path defines_luacheckrc, path, {}
+    table.insert path, "fields"
     if values
-      -- Enum-like
+      -- Enum-like values, just add as-is
       for value in *values
-        names[] = "#{prefix}#{name}.#{value.name}"
-    else if subkeys
-      -- Tree-like
-      for child in *(extract_defines_namespace subkeys, "#{prefix}#{name}.")
-        names[] = child
+        table.insert path, value.name
+        table_insert_path defines_luacheckrc, path, {}
+        table.remove path
+      table.remove path
+    if subkeys
+      -- Tree-like, needs to be handled as its own define on a deeper path
+      for child in *subkeys
+        sub_path = table_deep_copy path
+        table.insert processing, {child, sub_path}
+  return defines_luacheckrc
+
+
+INDEXABLE_COMPLEX_TYPES = { t, true for t in *{"array", "dictionary", "LuaCustomTable", "table", "tuple"}}
+extract_luacheckrc_json_api_globals = (runtime_api_json) ->
+  luacheckrc = {}
+
+  -- global_objects are class references, resolve them
+  classes = {class_.name, class_ for class_ in *runtime_api_json.classes}
+  global_objects = {obj.name, classes[obj.type] for obj in *runtime_api_json.global_objects}
+
+  -- Types can be a complex_type, or string reference to a: basic type, Class,
+  -- Concept, or Define
+
+  -- Concepts are either a Type, or a special complex_type with just: { type:
+  -- "builtin" }, and the actual table encoded in the name of the concept
+  concepts = {concept.name, concept for concept in *runtime_api_json.concepts}
+
+  basic_types = {concept.name, true for concept in *runtime_api_json.concepts when concept.type.complex_type and concept.type.complex_type == "builtin"}
+  -- NOTE: 'bool' is used once instead of 'boolean' in at least one API JSON
+  -- doc; this is probably a bug in the data but we need to account for it
+  basic_types.bool = true
+
+  processing = [{obj, {"read_globals", name}} for name, obj in pairs global_objects]
+  while next_ := table.remove processing
+    {obj, path} = next_
+    {:methods, :attributes} = obj
+    table_insert_path luacheckrc, path, {}
+    table.insert path, "fields"
+    if methods
+      for method in *methods
+        table.insert path, method.name
+        table_insert_path luacheckrc, path, {}
+        table.remove path
+    if attributes
+      -- Class attributes are Types.
+      for attr in *attributes
+        table.insert path, attr.name
+        attr_block = {}
+        table_insert_path luacheckrc, path, attr_block
+        -- Determine if the attribute can be indexed, can be written to, etc.,
+        -- and if any further changes are needed as a result
+
+        if attr.write_type
+          attr_block.read_only = false
+
+        -- There's plenty of infinite recursion possible here, so just go
+        -- three levels deep, e.g. game.player.activate_paste.
+        -- Ideally we'd be dynamically looking up things instead, but we'd need
+        -- a proper LSP for that... something to think about.
+        recurse = #path < 6
+
+        type_ = attr.read_type or attr.write_type
+
+        -- Concepts are just a level of Type indirection with extra documentation
+        if concepts[type_]
+          type_ = concepts[type_]
+
+        -- Handle another form of Type indirection
+        if type_.complex_type == "type"
+          type_ = type_.value
+
+        if (type type_) == "string"
+          if basic_types[type_]
+            if type_ == "table"
+              attr_block.other_fields = true
+          -- Check for class reference
+          else if classes[type_]
+            if recurse
+              sub_path = table_deep_copy path
+              table.insert processing, {classes[type_], sub_path}
+            else
+              attr_block.other_fields = true
+          else if (type_\match "^defines%.") == nil
+            -- If it's not a Define, NFI what else it could be at this point
+            error "Unhandled type value: #{type_}"
+        else
+          if INDEXABLE_COMPLEX_TYPES[type_.complex_type]
+            attr_block.other_fields = true
+        table.remove path
+
+      table.remove path
+
+  return luacheckrc
+
+
+global_paths_to_luacheckrc_definitions = (global_paths) ->
+  defs = {
+    read_globals: {}
+    globals: {}
+  }
+  for path in *global_paths
+    elements = string_split path, "."
+    if #elements == 1
+      e = elements[1]
+      if WRITEABLE_GLOBALS[e]
+        defs.globals[]= e
+      else
+        defs.read_globals[]= e
     else
-      names[] = "#{prefix}#{name}"
-  return names
+      -- TODO/FIXME
+      path_attrs = { }
+      e_seen = {}
+      for i, e in ipairs elements
+        e_seen[] = e
+        sub_path = array_join ".", e_seen
+        print "path: #{path}"
+        print inspect sub_path
+
+  print serpent.block defs
+  os.exit 1
+  return
 
 
 validate_json_docs = (versions) ->

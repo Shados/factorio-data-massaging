@@ -2,15 +2,13 @@ import "unix"
 
 local *
 
-deep_copy = (t, _seen={}) ->
-  res = {}
-  _seen[t] = res
-  for k, v in pairs t
-    if (type v) == "table"
-      res[k] = _seen[v] or deep_copy(v, _seen)
-    else
-      res[k] = v
-  return res
+
+array_join = (delimiter, array) ->
+  collected = ""
+  for i, v in ipairs array
+    collected ..= delimiter if i != 1
+    collected ..= v
+  return collected
 
 
 lsdir = (path) ->
@@ -29,7 +27,7 @@ run_cmd = (cmd) ->
   assert ok, "Failed to run `#{cmd}`, #{status}, #{num}"
 
 
-split_string = (str, delimiter) ->
+string_split = (str, delimiter) ->
   -- Yes, we really do start the indexes at 0; this is because we're working
   -- with #str and str\sub, *not* indexing a table
   collected = {}
@@ -60,6 +58,53 @@ split_string = (str, delimiter) ->
         table.insert collected, str\sub previous_index, current_index
       return collected
 
+
+table_bare_pairs = (t) ->
+  return next, t, nil
+
+
+table_deep_copy = (t, _seen={}, copymeta=false) ->
+  res = {}
+  _seen[t] = res
+  for k, v in next, t
+    if (type v) == "table"
+      res[k] = _seen[v] or table_deep_copy(v, _seen, copymeta)
+    else
+      res[k] = v
+  setmetatable res, (getmetatable t) if copymeta
+  return res
+
+
+table_shallow_copy = (t, copymeta=false) ->
+  res = {k, v for k, v in table_bare_pairs t}
+  setmetatable res, (getmetatable t) if copymeta
+  return res
+
+
+table_get_path = (tbl, path) ->
+  cur = tbl
+  -- Walk (and create, if needed) path down to the end
+  for segment in *path
+    next_ = cur[segment]
+    unless next_
+      next_ = {}
+      cur[segment] = next_
+    cur = next_
+  return cur
+
+
+table_insert_path = (tbl, path, item) ->
+  cur = tbl
+  -- Walk (and create, if needed) path down to last segment
+  for i=1, #path-1
+    segment = path[i]
+    next_ = cur[segment]
+    unless next_
+      next_ = {}
+      cur[segment] = next_
+    cur = next_
+  cur[path[#path]] = item
+
 xdg_home_default = (dir_type) ->
   var = "XDG_#{dir_type\upper!}_HOME"
   suffix = switch dir_type
@@ -86,4 +131,4 @@ xdg_home_default = (dir_type) ->
 
   error "Couldn't determine appropriate path for #{var} directory, try setting the environment variable"
 
-{ :deep_copy, :lsdir, :run_cmd, :split_string, :xdg_home_default }
+{ :array_join, :lsdir, :run_cmd, :string_split, :table_deep_copy, :table_shallow_copy, :table_get_path, :table_insert_path, :xdg_home_default }

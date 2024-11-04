@@ -27,6 +27,7 @@
     - uint8
     - uint16 (documented but unused)
     - uint64
+    - "LuaObject", this is really only used abstractly though
 
 - Internally of course, all Lua numbers are doubles. The additional types
   partly serve as documentation, and partly because some functions are backed
