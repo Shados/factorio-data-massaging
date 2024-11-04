@@ -1,6 +1,6 @@
 {
-    "library": "event_handler",
     "new_globals": {},
+    "library": "event_handler",
     "loaded_module_names": [
         "event_handler.add_lib",
         "event_handler.add_libraries"

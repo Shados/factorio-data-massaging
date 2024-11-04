@@ -1,6 +1,6 @@
 {
-    "library": "crash-site",
     "new_globals": {},
+    "library": "crash-site",
     "loaded_module_names": [
         "crash_site.create_crash_site",
         "crash_site.create_cutscene",

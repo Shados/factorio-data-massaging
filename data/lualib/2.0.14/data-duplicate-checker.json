@@ -1,6 +1,6 @@
 {
-    "library": "data-duplicate-checker",
     "new_globals": {},
+    "library": "data-duplicate-checker",
     "loaded_module_names": [
         "data_duplicate_checker.check_for_duplicates",
         "data_duplicate_checker.check_for_overwrites"

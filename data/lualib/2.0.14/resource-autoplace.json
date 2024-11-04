@@ -1,9 +1,9 @@
 {
-    "library": "resource-autoplace",
     "new_globals": [
         "autoplace_sets",
         "get_autoplace_set"
     ],
+    "library": "resource-autoplace",
     "loaded_module_names": [
         "resource_autoplace.initialize_patch_set",
         "resource_autoplace.resource_autoplace_settings"

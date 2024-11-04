@@ -1,6 +1,6 @@
 {
-    "library": "collision-mask-util",
     "new_globals": {},
+    "library": "collision-mask-util",
     "loaded_module_names": [
         "collision_mask_util.collect_prototypes_colliding_with_mask",
         "collision_mask_util.collect_prototypes_with_layer",

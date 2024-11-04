@@ -1,3 +1,4 @@
+import "inspect"
 import "unix"
 
 local *
@@ -63,20 +64,14 @@ table_bare_pairs = (t) ->
   return next, t, nil
 
 
-table_deep_copy = (t, _seen={}, copymeta=false) ->
+table_deep_copy = (t, copymeta=false, _seen={}) ->
   res = {}
   _seen[t] = res
   for k, v in next, t
     if (type v) == "table"
-      res[k] = _seen[v] or table_deep_copy(v, _seen, copymeta)
+      res[k] = _seen[v] or table_deep_copy(v, copymeta, _seen)
     else
       res[k] = v
-  setmetatable res, (getmetatable t) if copymeta
-  return res
-
-
-table_shallow_copy = (t, copymeta=false) ->
-  res = {k, v for k, v in table_bare_pairs t}
   setmetatable res, (getmetatable t) if copymeta
   return res
 
@@ -104,6 +99,60 @@ table_insert_path = (tbl, path, item) ->
       cur[segment] = next_
     cur = next_
   cur[path[#path]] = item
+  return tbl
+
+
+-- NOTE: Assumes there's never a situation in which a[key] is a table and
+-- b[key] is not a table, or vice-versa.
+-- NOTE: Assumes no circular references.
+-- NOTE: Assumes no metatables.
+table_intersection = (a, b) ->
+  intersection = {}
+  for k, v in pairs a
+    continue unless b[k] != nil
+    if (type v) == "table"
+      intersection[k] = table_intersection v, b[k]
+    else
+      intersection[k] = v
+  return intersection
+
+
+table_remove_path = (tbl, path) ->
+  cur = tbl
+  -- Walk path down to last segment
+  for i=1, #path-1
+    segment = path[i]
+    next_ = cur[segment]
+    assert next_, "table_remove_path(): path #{inspect path} not valid for table"
+    cur = next_
+  cur[path[#path]] = nil
+  return tbl
+
+
+table_shallow_copy = (t, copymeta=false) ->
+  res = {k, v for k, v in table_bare_pairs t}
+  setmetatable res, (getmetatable t) if copymeta
+  return res
+
+
+-- NOTE: Assumes there's never a situation in which a[key] is a table and
+-- b[key] is not a table, or vice-versa.
+-- NOTE: Assumes no circular references.
+-- NOTE: Assumes no metatables.
+table_union = (...) ->
+  argn = select '#', ...
+  assert argn >= 2, "Didn't provide at least 2 tables to table_union"
+  a = select 1, ...
+  union = table_deep_copy a
+  for i = 2, argn
+    other = select i, ...
+    for k, v in pairs other
+      if (type v) == "table" and (type union[k]) == "table"
+        union[k] = table_union union[k], v
+      else
+        union[k] = v
+  return union
+
 
 xdg_home_default = (dir_type) ->
   var = "XDG_#{dir_type\upper!}_HOME"
@@ -131,4 +180,17 @@ xdg_home_default = (dir_type) ->
 
   error "Couldn't determine appropriate path for #{var} directory, try setting the environment variable"
 
-{ :array_join, :lsdir, :run_cmd, :string_split, :table_deep_copy, :table_shallow_copy, :table_get_path, :table_insert_path, :xdg_home_default }
+{
+  :array_join
+  :lsdir
+  :run_cmd
+  :string_split
+  :table_deep_copy
+  :table_get_path
+  :table_insert_path
+  :table_intersection
+  :table_remove_path
+  :table_shallow_copy
+  :table_union
+  :xdg_home_default
+}

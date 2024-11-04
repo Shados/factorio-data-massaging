@@ -1,6 +1,6 @@
 {
-    "library": "math2d",
     "new_globals": {},
+    "library": "math2d",
     "loaded_module_names": [
         "math2d.bounding_box",
         "math2d.bounding_box.collides_with",

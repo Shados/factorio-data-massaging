@@ -1,0 +1,39 @@
+local *
+
+Module =
+  new: (major, minor, patch) ->
+    setmetatable {(tonumber major), (tonumber minor), (tonumber patch)}, metatable
+  parse: (ver_str) ->
+    {major, minor, patch} = {ver_str\match "^(%d+)%.(%d+)%.(%d+)$"}
+    assert major != nil, "Couldn't parse as version: '#{ver_str}'"
+    Module.new major, minor, patch
+
+metatable =
+  __tostring: (self) ->
+    {major, minor, patch} = self
+    return string.format "%u.%u.%u", major, minor, patch
+  __concat: (a, b) ->
+    if (type a == "table") and (getmetatable table) == metatable
+      return tostring a .. b
+    else
+      return a .. tostring b
+
+  __eq: (a, b) -> a[1] == b[1] and a[2] == b[2] and a[3] == b[3]
+  __lt: (a, b) ->
+    if a[1] != b[1]
+      return a[1] < b[1]
+    if a[2] != b[2]
+      return a[2] < b[2]
+    else
+      return a[3] < b[3]
+  __le: (a, b) ->
+    if a[1] != b[1]
+      return a[1] <= b[1]
+    if a[2] != b[2]
+      return a[2] <= b[2]
+    if a[3] != b[3]
+      return a[3] <= b[3]
+    return true
+
+
+return Module

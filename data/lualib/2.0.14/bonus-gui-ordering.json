@@ -1,5 +1,4 @@
 {
-    "library": "bonus-gui-ordering",
     "new_globals": [
         "bonus_gui_ordering",
         "bonus_gui_ordering.artillery-shell",
@@ -28,5 +27,6 @@
         "bonus_gui_ordering.train_braking_force",
         "bonus_gui_ordering.turret_attack",
         "bonus_gui_ordering.worker_robots"
-    ]
+    ],
+    "library": "bonus-gui-ordering"
 }

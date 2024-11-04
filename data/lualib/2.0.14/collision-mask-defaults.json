@@ -1,6 +1,6 @@
 {
-    "library": "collision-mask-defaults",
     "new_globals": {},
+    "library": "collision-mask-defaults",
     "loaded_module_names": [
         "collision_mask_defaults.accumulator",
         "collision_mask_defaults.accumulator.layers",

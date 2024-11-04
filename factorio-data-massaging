@@ -1,4 +1,5 @@
 #!/usr/bin/env -S yue -e
+-- TODO pick betweeen prototype and data as names and stick with one, heh
 import "argparse"
 import "inspect"
 import "jsonschema"
@@ -6,8 +7,31 @@ import "unix"
 import "rapidjson"
 import "serpent"
 import "ssl.https"
-import "lib" as :array_join, :table_deep_copy, :lsdir, :run_cmd, :string_split, :table_get_path, :table_insert_path, :table_shallow_copy, :xdg_home_default
-import "lib.luacheck" as :ADDED_LUA_GLOBALS, :INSTRUMENT_MODE_LUA_GLOBALS, :INSTRUMENT_MODE_REMOVED_GLOBALS, :PROTOTYPE_LUA_GLOBALS, :REMOVED_LUA_GLOBALS, :STD_LUACHECK_LUA52C
+import "lib" as {
+  :lsdir
+  :run_cmd
+  :string_split
+  :table_get_path
+  :table_deep_copy
+  :table_insert_path
+  :table_intersection
+  :table_remove_path
+  :table_shallow_copy
+  :table_union
+  :xdg_home_default
+}
+import "lib.semver" as semver
+import "lib.luacheck" as {
+  :ADDED_LUA_GLOBALS
+  :INSTRUMENT_MODE_LUA_GLOBALS
+  :PROTOTYPE_LUA_GLOBALS
+  :PROTOTYPE_LUA_READ_ONLY_INDEXABLE_GLOBALS
+  :PROTOTYPE_LUA_WRITE_INDEXABLE_GLOBALS
+  :REMOVED_LUA_GLOBALS
+  :RUNTIME_LUA_READ_ONLY_INDEXABLE_GLOBALS
+  :RUNTIME_LUA_WRITE_INDEXABLE_GLOBALS
+  :STD_LUACHECK_LUA52C
+}
 
 local *
 
@@ -19,12 +43,11 @@ CACHE_DIR = "#{xdg_home_default "cache"}/factorio-data-generation"
 FACTORIO_DATA_DIR = "#{CACHE_DIR}/factorio-data"
 FACTORIO_DATA_REPO_DIR = "#{CACHE_DIR}/factorio-data-repo"
 JSON_DOCS_DIR = "#{SCRIPT_DIR}/json-docs"
-LUA_DATA_DIR = "#{SCRIPT_DIR}/lua-data"
+DATA_DIR = "#{SCRIPT_DIR}/data"
+LUA_DATA_DIR = "#{DATA_DIR}/lualib"
+LUACHECKRC_DIR = "#{DATA_DIR}/luacheckrc"
 RUNTIME_DOCS_DIR = "#{JSON_DOCS_DIR}/runtime-api"
-RUNTIME_DOCS_EARLIEST_VERSION = {1, 1, 35}
-FIRST_VERSION_WITHOUT_MODULE = { 2, 0, 0 }
 PROTOTYPE_DOCS_DIR = "#{JSON_DOCS_DIR}/prototype-api"
-PROTOTYPE_DOCS_EARLIEST_VERSION = {1, 1, 89}
 SCHEMA_DIR = "#{SCRIPT_DIR}/schemas"
 KNOWN_BUGGED_RUNTIME_DOC_VERSIONS = {
   "1.1.108": true
@@ -48,19 +71,14 @@ PROTOTYPE_LOADED_LUALIBS = {
   "bonus-gui-ordering"
   "sound-util"
 }
-STORAGE_RENAME_FIRST_VERSION = { 2, 0, 0 }
-WRITEABLE_GLOBALS = {
-  "data.raw"
-  "global"
-  "storage"
-  "settings.global"
-  "settings.player_default"
-}
-WRITEABLE_GLOBALS = {g, true for g in *WRITEABLE_GLOBALS}
+FIRST_VERSION_WITHOUT_MODULE = semver.new 2, 0, 0
+FIRST_VERSION_WITH_RENAMED_STORAGE = semver.new 2, 0, 0
+FIRST_VERSION_WITH_RUNTIME_DOCS = semver.new 1, 1, 35
+FIRST_VERSION_WTIH_PROTOTYPE_DOCS = semver.new 1, 1, 89
 
 main = ->
   doc_version_list = get_doc_versions!
-  most_recent_version = doc_version_list[#doc_version_list].version
+  most_recent_version = doc_version_list[#doc_version_list]
   ensure_docs doc_version_list
 
   parser = argparse!
@@ -80,7 +98,7 @@ main = ->
   switch args.command
     when "extract-core-lualibs"
       ensure_factorio_data!
-      for {:version} in *doc_version_list
+      for version in *doc_version_list
         extract_core_lualibs version
     when "latest-version"
       print most_recent_version
@@ -108,46 +126,18 @@ get_doc_versions = ->
 
 parse_versions_html = (html_str) ->
   -- Aww yeah, time to ~~parse~~scrape HTML with regex :V
-  versions = [{(tonumber major), (tonumber minor), (tonumber sub)} for major, minor, sub in html_str\gmatch ">%s-(%d+)%.(%d+)%.(%d+)%s-<"]
-  table.sort versions, version_sort
-  versions = for version in *versions
-    continue unless  version_at_least RUNTIME_DOCS_EARLIEST_VERSION, version
-    {:version, has_prototype_docs: version_at_least PROTOTYPE_DOCS_EARLIEST_VERSION, version}
-  return [{version: "#{v[1]}.#{v[2]}.#{v[3]}", :has_prototype_docs} for {version: v, :has_prototype_docs} in *versions]
-
-
-version_at_least = (compare_to, version) ->
-  if compare_to[1] != version[1]
-    return compare_to[1] <= version[1]
-  if compare_to[2] != version[2]
-    return compare_to[2] <= version[2]
-  if compare_to[3] != version[3]
-    return compare_to[3] <= version[3]
-  return true
-
-
-version_sort = (a, b) ->
-  if a[1] != b[1]
-    return a[1] < b[1]
-  if a[2] != b[2]
-    return a[2] < b[2]
-  else
-    return a[3] < b[3]
-
-
-version_parse = (ver_str) ->
-  {major, minor, sub} = {ver_str\match "^(%d+)%.(%d+)%.(%d+)$"}
-  assert major != nil, "Couldn't parse as version: '#{ver_str}'"
-  {(tonumber major), (tonumber minor), (tonumber sub)}
+  versions = [(semver.new major, minor, patch) for major, minor, patch in html_str\gmatch ">%s-(%d+)%.(%d+)%.(%d+)%s-<"]
+  table.sort versions
+  return [version for version in *versions when version >= FIRST_VERSION_WITH_RUNTIME_DOCS]
 
 
 ensure_docs = (doc_version_list) ->
   unix.mkpath RUNTIME_DOCS_DIR
   unix.mkpath PROTOTYPE_DOCS_DIR
-  for {:version, :has_prototype_docs} in *doc_version_list
+  for version in *doc_version_list
     cached_runtime_file = "#{RUNTIME_DOCS_DIR}/#{version}.json"
     ensure_url_downloaded "#{API_BASE}/#{version}/runtime-api.json", cached_runtime_file
-    if has_prototype_docs
+    if version >= FIRST_VERSION_WTIH_PROTOTYPE_DOCS
       cached_prototype_file = "#{PROTOTYPE_DOCS_DIR}/#{version}.json"
       ensure_url_downloaded "#{API_BASE}/#{version}/prototype-api.json", cached_prototype_file
 
@@ -520,61 +510,111 @@ build_lua_defines = (defines_json) ->
 
 
 generate_luacheckrc_files = (versions) ->
-  version = versions[#versions].version -- TODO multiple versions
-  runtime_api_json = rapidjson.load "#{RUNTIME_DOCS_DIR}/#{version}.json"
-  prototype_api_json = rapidjson.load "#{PROTOTYPE_DOCS_DIR}/#{version}.json"
+  unix.mkpath LUACHECKRC_DIR
+  for version in *versions
+    luacheckrc_path = "#{LUACHECKRC_DIR}/#{version}.lua"
+    if unix.stat luacheckrc_path
+      print "#{version}: Existing luacheckrc output file, not overwriting"
+      continue
+    else if not unix.stat "#{LUA_DATA_DIR}/#{version}"
+      print "#{version}: Skipping, no lualib directory to extract from"
+      continue
+    else
+      print "#{version}: Building luacheckrc output file"
+    runtime_api_json = rapidjson.load "#{RUNTIME_DOCS_DIR}/#{version}.json"
 
-  -- Include core-mod's `util`, `bonus-gui-ordering`, and `sound-util`
-  -- libraries as part of the accessible globals during the prototype stage, as
-  -- these are loaded by the core-mod at that point, and the prototype stage
-  -- uses a single shared Lua state for all mods.
-  lualibs_set = {lib, true for lib in *PROTOTYPE_LOADED_LUALIBS}
-  lualib_data_stage_globals = populate_lualib_globals version, lualibs_set
+    -- Include core-mod's `util`, `bonus-gui-ordering`, and `sound-util`
+    -- libraries as part of the accessible globals during the prototype stage, as
+    -- these are loaded by the core-mod at that point, and the prototype stage
+    -- uses a single shared Lua state for all mods.
+    lualibs_set = {lib, true for lib in *PROTOTYPE_LOADED_LUALIBS}
+    lualib_data_stage_globals = populate_lualib_globals version, lualibs_set
+      |> global_paths_to_luacheckrc
 
-  -- These may well be identical, haven't actually checked
-  data_stage_defines = extract_luacheckrc_defines prototype_api_json
-  runtime_stage_defines = extract_luacheckrc_defines runtime_api_json
+    runtime_stage_defines = extract_luacheckrc_defines runtime_api_json
+    runtime_stage_dynamic_globals, global_functions = extract_luacheckrc_json_api_globals runtime_api_json
+    -- The data stage shares the same global_functions as the runtime stage,
+    -- they're just not in its API docs
+    data_stage_global_funcs = {read_globals: global_functions }
 
-  runtime_stage_dynamic_globals = extract_luacheckrc_json_api_globals runtime_api_json
-  -- runtime_stage_dynamic_globals = extract_json_api_globals version, runtime_api_json
-  print serpent.block runtime_stage_dynamic_globals
-  os.exit 1
+    -- Populate the feature_flags mapping, if present
+    local feature_flag_globals
+    for {:name, :attributes} in *runtime_api_json.classes
+      found = false
+      continue if name != "LuaBootstrap"
+      for attribute in *attributes
+        continue if attribute.name != "feature_flags"
+        feature_flag_globals = {name, {} for {:name} in *attribute.read_type.parameters}
+        found = true
+        break
+      break if found
+    feature_flag_globals = { read_globals: { feature_flags: { fields: feature_flag_globals }} }
 
-  -- Populate the feature_flags mapping, if present
-  feature_flags = {}
-  for {:name, :attributes} in *runtime_api_json.classes
-    continue if name != "LuaBootstrap"
-    for attribute in *attributes
-      continue if attribute.name != "feature_flags"
-      flag_names = ["feature_flags.#{name}" for {:name} in *attribute.read_type.parameters]
-      feature_flags = flag_names
+    -- Populate from our manual lists of non-machine-documented extra globals
+    added_globals = global_paths_to_luacheckrc ADDED_LUA_GLOBALS
+    prototype_added_globals = global_paths_to_luacheckrc PROTOTYPE_LUA_GLOBALS
 
-  data_stage_new_globals = {
-    ...ADDED_LUA_GLOBALS
-    ...PROTOTYPE_LUA_GLOBALS
-    ...feature_flags
-    ...data_stage_defines
-    ...lualib_data_stage_globals
-  }
-  table.sort data_stage_new_globals
+    removed_lua_globals = REMOVED_LUA_GLOBALS
+    if version >= FIRST_VERSION_WITHOUT_MODULE
+      removed_lua_globals[]= "module"
 
-  runtime_stage_new_globals = {
-    ...ADDED_LUA_GLOBALS
-    ...runtime_stage_defines
-    ...runtime_stage_dynamic_globals
-  }
-  table.sort runtime_stage_new_globals
+    -- Mush it all together, adding in the Lua 5.2 LUA_COMPAT_ALL baseline, then
+    -- removing that needs to be removed. Ideally we could just use luacheck's
+    -- lua52c standard and add the remove list to `not_globals` in our std, but
+    -- `not_globals` is not supported within standards
+    data_stage_new_globals = table_union STD_LUACHECK_LUA52C,
+                                         added_globals,
+                                         prototype_added_globals,
+                                         feature_flag_globals,
+                                         runtime_stage_defines,
+                                         data_stage_global_funcs,
+                                         lualib_data_stage_globals
+                             |> remove_global_paths_from_luacheckrc REMOVED_LUA_GLOBALS
 
-  global_paths_to_luacheckrc_definitions runtime_stage_new_globals
-  os.exit 1
-  io.write "runtime_stage_new_global = "
-  print serpent.serialize runtime_stage_new_globals, {}
-  -- Get set of globals added by Factorio
-  -- TODO set luacheck base std option to lua 5.2
-  error("unimplemented")
+    runtime_stage_new_globals = table_union STD_LUACHECK_LUA52C,
+                                            added_globals,
+                                            runtime_stage_defines,
+                                            runtime_stage_dynamic_globals
+                             |> remove_global_paths_from_luacheckrc REMOVED_LUA_GLOBALS
 
 
-populate_lualib_globals = (version, filter=nil) ->
+    -- We also mmanually patch a few relevant, documented things that can't be
+    -- determined automatically from the data or lualib extractions
+    make_indexable = (t) -> t.other_fields = true
+    make_indexable_writable = (t) ->
+      t.other_fields = true
+      t.read_only = false
+    data_stage_new_globals = data_stage_new_globals
+      |> modify_luacheckrc_paths PROTOTYPE_LUA_READ_ONLY_INDEXABLE_GLOBALS, make_indexable
+      |> modify_luacheckrc_paths PROTOTYPE_LUA_WRITE_INDEXABLE_GLOBALS, make_indexable_writable
+
+    storage_name = if version >= FIRST_VERSION_WITH_RENAMED_STORAGE
+      "storage"
+    else
+      "global"
+    write_indexable_globals = [storage_name, ...RUNTIME_LUA_WRITE_INDEXABLE_GLOBALS]
+
+    runtime_stage_new_globals = runtime_stage_new_globals
+      |> modify_luacheckrc_paths RUNTIME_LUA_READ_ONLY_INDEXABLE_GLOBALS, make_indexable
+      |> modify_luacheckrc_paths write_indexable_globals, make_indexable_writable
+
+    instrument_mode_globals = global_paths_to_luacheckrc INSTRUMENT_MODE_LUA_GLOBALS
+
+    factorio_min_globals = table_intersection data_stage_new_globals, runtime_stage_new_globals
+    luacheckrc =
+      stds:
+        factorio_data_stage: data_stage_new_globals
+        factorio_control_stage: runtime_stage_new_globals
+        factorio_instrument_mode: instrument_mode_globals
+        factorio_min: factorio_min_globals
+
+    with assert(io.open luacheckrc_path, "w", "Couldn't open #{luacheckrc_path} for writing")
+      \write "return "
+      \write serpent.serialize luacheckrc, {indent: "  "}
+      \close!
+
+
+populate_lualib_globals = (version, restrict_libs_to=nil) ->
   lualib_dir = "#{LUA_DATA_DIR}/#{version}"
   lualib_globals = {}
   -- Include core-mod's `util`, `bonus-gui-ordering`, and `sound-util`
@@ -586,7 +626,7 @@ populate_lualib_globals = (version, filter=nil) ->
   for child_path in *lib_dir_files
     libname = child_path\match "^(.+)%.json$"
     continue unless libname
-    continue if filter[libname]
+    continue if restrict_libs_to and restrict_libs_to[libname] == nil
     lualibs[]= libname
     lualib_json = rapidjson.load "#{lualib_dir}/#{libname}.json"
     for path in *lualib_json.new_globals
@@ -638,6 +678,20 @@ extract_luacheckrc_defines = (api_json) ->
 INDEXABLE_COMPLEX_TYPES = { t, true for t in *{"array", "dictionary", "LuaCustomTable", "table", "tuple"}}
 extract_luacheckrc_json_api_globals = (runtime_api_json) ->
   luacheckrc = {}
+  luacheckrc.read_globals = {}
+  global_functions = {}
+
+  if runtime_api_json.global_functions
+    for {:name} in *runtime_api_json.global_functions
+      luacheckrc.read_globals[name] = {}
+      global_functions[name] = {}
+  else
+    -- Older runtime APIs don't have it, so populate from this fixed list
+    global_functions =
+      localised_print: {}
+      log: {}
+      table_size: {}
+    luacheckrc.read_globals = table_deep_copy global_functions
 
   -- global_objects are class references, resolve them
   classes = {class_.name, class_ for class_ in *runtime_api_json.classes}
@@ -650,7 +704,13 @@ extract_luacheckrc_json_api_globals = (runtime_api_json) ->
   -- "builtin" }, and the actual table encoded in the name of the concept
   concepts = {concept.name, concept for concept in *runtime_api_json.concepts}
 
-  basic_types = {concept.name, true for concept in *runtime_api_json.concepts when concept.type.complex_type and concept.type.complex_type == "builtin"}
+  basic_types = {}
+  if runtime_api_json.builtin_types
+    -- Older API versions didn't track it in the concepts, but as its own top-level opject
+    for {:name} in *runtime_api_json.builtin_types
+      basic_types[name] = true
+  else
+    basic_types = {concept.name, true for concept in *runtime_api_json.concepts when concept.type and concept.type.complex_type and concept.type.complex_type == "builtin"}
   -- NOTE: 'bool' is used once instead of 'boolean' in at least one API JSON
   -- doc; this is probably a bug in the data but we need to account for it
   basic_types.bool = true
@@ -675,7 +735,7 @@ extract_luacheckrc_json_api_globals = (runtime_api_json) ->
         -- Determine if the attribute can be indexed, can be written to, etc.,
         -- and if any further changes are needed as a result
 
-        if attr.write_type
+        if attr.write_type or attr.write == false
           attr_block.read_only = false
 
         -- There's plenty of infinite recursion possible here, so just go
@@ -684,7 +744,7 @@ extract_luacheckrc_json_api_globals = (runtime_api_json) ->
         -- a proper LSP for that... something to think about.
         recurse = #path < 6
 
-        type_ = attr.read_type or attr.write_type
+        type_ = attr.type or attr.read_type or attr.write_type
 
         -- Concepts are just a level of Type indirection with extra documentation
         if concepts[type_]
@@ -715,41 +775,57 @@ extract_luacheckrc_json_api_globals = (runtime_api_json) ->
 
       table.remove path
 
+  return luacheckrc, global_functions
+
+
+-- Convert set of 'serpent.serialize' paths to a strict read_globals luacheckrc
+-- configuration block
+global_paths_to_luacheckrc = (global_paths) ->
+  luacheckrc_globals = {}
+  for str_path in *global_paths
+    path = string_split str_path, "."
+    cur = luacheckrc_globals
+    for i, path_element in ipairs path
+      cur[path_element] = {} unless cur[path_element]
+      if i != #path
+        cur[path_element].fields = {} unless cur[path_element].fields
+        cur = cur[path_element].fields
+
+  return {read_globals: luacheckrc_globals}
+
+
+remove_global_paths_from_luacheckrc = (luacheckrc, global_paths) ->
+  global_paths = [global_path_to_luacheckrc_path path for path in *global_paths]
+  for path in *global_paths
+    table_remove_path luacheckrc, path
   return luacheckrc
 
 
-global_paths_to_luacheckrc_definitions = (global_paths) ->
-  defs = {
-    read_globals: {}
-    globals: {}
-  }
-  for path in *global_paths
-    elements = string_split path, "."
-    if #elements == 1
-      e = elements[1]
-      if WRITEABLE_GLOBALS[e]
-        defs.globals[]= e
-      else
-        defs.read_globals[]= e
-    else
-      -- TODO/FIXME
-      path_attrs = { }
-      e_seen = {}
-      for i, e in ipairs elements
-        e_seen[] = e
-        sub_path = array_join ".", e_seen
-        print "path: #{path}"
-        print inspect sub_path
+global_path_to_luacheckrc_path = (global_path) ->
+  path = string_split global_path, "."
+  res = {"read_globals"}
+  for i, path_element in ipairs path
+    res[]= path_element
+    res[]= "fields" if i != #path
+  return res
 
-  print serpent.block defs
-  os.exit 1
-  return
+
+modify_luacheckrc_paths = (luacheckrc, paths, fn) ->
+  for path in *paths
+    block = get_luacheckrc_path luacheckrc, path
+    fn block
+  return luacheckrc
+
+
+get_luacheckrc_path = (luacheckrc, path) ->
+  path = global_path_to_luacheckrc_path path
+  return table_get_path luacheckrc, path
 
 
 validate_json_docs = (versions) ->
   runtime_validators, prototype_validators = initialise_json_schema_validators!
   print "Validating machine-readable runtime API docs against JSON Schemas"
-  for {:version} in *versions
+  for version in *versions
     runtime_api_json = rapidjson.load "#{RUNTIME_DOCS_DIR}/#{version}.json"
     runtime_validator = runtime_validators[runtime_api_json.api_version]
     if runtime_validator
@@ -757,14 +833,14 @@ validate_json_docs = (versions) ->
       if valid
         print "runtime #{version}: valid"
       else
-        if KNOWN_BUGGED_RUNTIME_DOC_VERSIONS[version]
+        if KNOWN_BUGGED_RUNTIME_DOC_VERSIONS[tostring version]
           print "runtime #{version}: invalid: known issue, the JSON from this version is bugged, see #{SCHEMA_DIR}/runtime-api-docs-bugs.md"
         else
           print "runtime #{version}: invalid"
         print err
 
-  for {:version, :has_prototype_docs} in *versions
-    continue unless has_prototype_docs
+  for version in *versions
+    continue unless version >= FIRST_VERSION_WTIH_PROTOTYPE_DOCS
     prototype_api_json = rapidjson.load "#{PROTOTYPE_DOCS_DIR}/#{version}.json"
     prototype_validator = prototype_validators[prototype_api_json.api_version]
     if prototype_validator
@@ -772,7 +848,7 @@ validate_json_docs = (versions) ->
       if valid
         print "prototype #{version}: valid"
       else
-        if KNOWN_BUGGED_PROTOTYPE_DOC_VERSIONS[version]
+        if KNOWN_BUGGED_PROTOTYPE_DOC_VERSIONS[tostring version]
           print "prototype #{version}: invalid: known issue, the JSON from this version is bugged, see #{SCHEMA_DIR}/prototype-api-docs-bugs.md"
         else
           print "prototype #{version}: invalid"

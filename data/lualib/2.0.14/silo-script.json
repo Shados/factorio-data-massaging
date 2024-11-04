@@ -1,6 +1,6 @@
 {
-    "library": "silo-script",
     "new_globals": {},
+    "library": "silo-script",
     "loaded_module_names": [
         "silo_script.add_commands",
         "silo_script.add_remote_interface",

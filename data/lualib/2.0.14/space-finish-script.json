@@ -1,6 +1,6 @@
 {
-    "library": "space-finish-script",
     "new_globals": {},
+    "library": "space-finish-script",
     "loaded_module_names": [
         "space_finish_script.events",
         "space_finish_script.on_configuration_changed",

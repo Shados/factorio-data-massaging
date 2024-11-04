@@ -1,5 +1,4 @@
 {
-    "library": "util",
     "new_globals": [
         "gram",
         "grams",
@@ -77,6 +76,7 @@
         "util.technology_icon_constant_speed",
         "util.technology_icon_constant_stack_size"
     ],
+    "library": "util",
     "loaded_module_names": [
         "util.add_shift",
         "util.add_shift_offset",

@@ -1,5 +1,4 @@
 {
-    "library": "circuit-connector-sprites",
     "new_globals": [
         "assembling_machine_circuit_wire_max_distance",
         "belt_connector_template",
@@ -1094,5 +1093,6 @@
         "universal_connector_template.wire_pins_shadow.shift",
         "universal_connector_template.wire_pins_shadow.width",
         "universal_connector_template.wire_shadow_offsets"
-    ]
+    ],
+    "library": "circuit-connector-sprites"
 }

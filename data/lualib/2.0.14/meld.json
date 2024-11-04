@@ -1,6 +1,6 @@
 {
-    "library": "meld",
     "new_globals": {},
+    "library": "meld",
     "loaded_module_names": [
         "meld.__call",
         "meld.append",

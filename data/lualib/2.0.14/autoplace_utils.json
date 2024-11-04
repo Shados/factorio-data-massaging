@@ -1,6 +1,6 @@
 {
-    "library": "autoplace_utils",
     "new_globals": {},
+    "library": "autoplace_utils",
     "loaded_module_names": [
         "autoplace_utils.peaks"
     ]

@@ -1,6 +1,6 @@
 {
-    "library": "math3d",
     "new_globals": {},
+    "library": "math3d",
     "loaded_module_names": [
         "math3d.matrix4x4",
         "math3d.matrix4x4.column",
