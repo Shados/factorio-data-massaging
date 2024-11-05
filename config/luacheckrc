@@ -3,6 +3,7 @@
 -- Use luacheck's fs lib to find the generated Factorio luacheckrc standards
 -- definition file
 local fs = require("luacheck.fs")
+-- TODO: Copy one of the data/luacheckrc/{version}.lua files to this path in your mod repo
 local factorio_config_file = ".luacheckrc.factorio"
 local factorio_config_dir = fs.find_file(fs.get_current_dir(), factorio_config_file)
 local factorio_config_path = factorio_config_dir .. "/" .. factorio_config_file

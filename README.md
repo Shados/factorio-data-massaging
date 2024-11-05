@@ -3,7 +3,7 @@
 ## What?
 
 - `config/luacheckrc`: an example `.luacheckrc` file intended to be used with
-  one of the files from `data/luacheckrc`
+  one of the files from `data/luacheckrc`.
 - `data/luacheckrc`: generated `.luacheckrc` files for many Factorio versions,
   providing the following additional `stds` entries:
     - `factorio_min`: Minimum set of shared globals present in Factorio's Lua
