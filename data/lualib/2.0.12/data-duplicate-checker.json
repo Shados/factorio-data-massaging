@@ -1,8 +1,8 @@
 {
     "library": "data-duplicate-checker",
-    "new_globals": {},
-    "loaded_module_names": [
+    "loaded_module_returns": [
         "data_duplicate_checker.check_for_duplicates",
         "data_duplicate_checker.check_for_overwrites"
-    ]
+    ],
+    "new_globals": {}
 }

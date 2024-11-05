@@ -1,18 +1,6 @@
 {
     "library": "util",
-    "new_globals": [
-        "gram",
-        "grams",
-        "hour",
-        "kg",
-        "kilometer",
-        "meter",
-        "minute",
-        "second",
-        "table.compare",
-        "table.deepcopy",
-        "tons",
-        "util",
+    "loaded_module_returns": [
         "util.add_shift",
         "util.add_shift_offset",
         "util.by_pixel",
@@ -77,7 +65,19 @@
         "util.technology_icon_constant_speed",
         "util.technology_icon_constant_stack_size"
     ],
-    "loaded_module_names": [
+    "new_globals": [
+        "gram",
+        "grams",
+        "hour",
+        "kg",
+        "kilometer",
+        "meter",
+        "minute",
+        "second",
+        "table.compare",
+        "table.deepcopy",
+        "tons",
+        "util",
         "util.add_shift",
         "util.add_shift_offset",
         "util.by_pixel",

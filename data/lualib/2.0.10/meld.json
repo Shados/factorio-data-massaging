@@ -1,7 +1,6 @@
 {
     "library": "meld",
-    "new_globals": {},
-    "loaded_module_names": [
+    "loaded_module_returns": [
         "meld.__call",
         "meld.append",
         "meld.control_handlers",
@@ -14,5 +13,6 @@
         "meld.invoke",
         "meld.meld",
         "meld.overwrite"
-    ]
+    ],
+    "new_globals": {}
 }

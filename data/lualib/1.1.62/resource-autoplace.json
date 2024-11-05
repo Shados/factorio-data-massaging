@@ -1,5 +1,9 @@
 {
     "library": "resource-autoplace",
+    "loaded_module_returns": [
+        "resource_autoplace.initialize_patch_set",
+        "resource_autoplace.resource_autoplace_settings"
+    ],
     "new_globals": [
         "resource_autoplace__patch_metasets",
         "resource_autoplace__patch_metasets.regular",
@@ -12,9 +16,5 @@
         "resource_autoplace__patch_metasets.starting.get_patch_set_index",
         "resource_autoplace__patch_metasets.starting.next_patch_set_index",
         "resource_autoplace__patch_metasets.starting.patch_set_indexes"
-    ],
-    "loaded_module_names": [
-        "resource_autoplace.initialize_patch_set",
-        "resource_autoplace.resource_autoplace_settings"
     ]
 }

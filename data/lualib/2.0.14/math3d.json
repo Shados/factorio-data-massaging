@@ -1,7 +1,6 @@
 {
-    "new_globals": {},
     "library": "math3d",
-    "loaded_module_names": [
+    "loaded_module_returns": [
         "math3d.matrix4x4",
         "math3d.matrix4x4.column",
         "math3d.matrix4x4.compose",
@@ -38,5 +37,6 @@
         "math3d.vector4.from_vec3",
         "math3d.vector4.sub",
         "math3d.vector4.zero"
-    ]
+    ],
+    "new_globals": {}
 }

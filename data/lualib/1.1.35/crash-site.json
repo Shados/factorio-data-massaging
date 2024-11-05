@@ -1,10 +1,10 @@
 {
     "library": "crash-site",
-    "new_globals": {},
-    "loaded_module_names": [
+    "loaded_module_returns": [
         "crash_site.create_crash_site",
         "crash_site.create_cutscene",
         "crash_site.is_crash_site_cutscene",
         "crash_site.on_player_display_refresh"
-    ]
+    ],
+    "new_globals": {}
 }

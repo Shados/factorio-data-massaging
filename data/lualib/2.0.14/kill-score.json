@@ -1,9 +1,9 @@
 {
-    "new_globals": {},
     "library": "kill-score",
-    "loaded_module_names": [
+    "loaded_module_returns": [
         "kill_score.generate_entity_prices",
         "kill_score.get_default_prices",
         "kill_score.get_kill_scores"
-    ]
+    ],
+    "new_globals": {}
 }

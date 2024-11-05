@@ -1,7 +1,6 @@
 {
     "library": "math2d",
-    "new_globals": {},
-    "loaded_module_names": [
+    "loaded_module_returns": [
         "math2d.bounding_box",
         "math2d.bounding_box.collides_with",
         "math2d.bounding_box.contains_box",
@@ -20,5 +19,6 @@
         "math2d.position.rotate_vector",
         "math2d.position.subtract",
         "math2d.position.vector_length"
-    ]
+    ],
+    "new_globals": {}
 }

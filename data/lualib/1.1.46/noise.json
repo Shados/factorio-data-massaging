@@ -1,7 +1,6 @@
 {
     "library": "noise",
-    "new_globals": {},
-    "loaded_module_names": [
+    "loaded_module_returns": [
         "noise.absolute_value",
         "noise.atan2",
         "noise.autoplace_probability",
@@ -46,5 +45,6 @@
         "noise.terrace_for_cliffs",
         "noise.to_noise_expression",
         "noise.var"
-    ]
+    ],
+    "new_globals": {}
 }

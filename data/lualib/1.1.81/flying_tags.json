@@ -1,8 +1,8 @@
 {
     "library": "flying_tags",
-    "new_globals": {},
-    "loaded_module_names": [
+    "loaded_module_returns": [
         "flying_tags.create",
         "flying_tags.update"
-    ]
+    ],
+    "new_globals": {}
 }

@@ -42,7 +42,7 @@ SCRIPT_DIR = do
 CACHE_DIR = "#{xdg_home_default "cache"}/factorio-data-generation"
 FACTORIO_DATA_DIR = "#{CACHE_DIR}/factorio-data"
 FACTORIO_DATA_REPO_DIR = "#{CACHE_DIR}/factorio-data-repo"
-JSON_DOCS_DIR = "#{SCRIPT_DIR}/json-docs"
+JSON_DOCS_DIR = "#{CACHE_DIR}/json-docs"
 DATA_DIR = "#{SCRIPT_DIR}/data"
 LUA_DATA_DIR = "#{DATA_DIR}/lualib"
 LUACHECKRC_DIR = "#{DATA_DIR}/luacheckrc"
@@ -78,7 +78,6 @@ FIRST_VERSION_WTIH_PROTOTYPE_DOCS = semver.new 1, 1, 89
 
 main = ->
   doc_version_list = get_doc_versions!
-  most_recent_version = doc_version_list[#doc_version_list]
   ensure_docs doc_version_list
 
   parser = argparse!
@@ -96,11 +95,14 @@ main = ->
   print "args: #{inspect args}"
 
   switch args.command
+    -- TODO generic "update" command that invalidates the cached version list
+    -- and runs the entire pipeline and TODO update the docs to mention it
     when "extract-core-lualibs"
       ensure_factorio_data!
       for version in *doc_version_list
         extract_core_lualibs version
     when "latest-version"
+      most_recent_version = doc_version_list[#doc_version_list]
       print most_recent_version
     when "luacheckrc"
       generate_luacheckrc_files doc_version_list
@@ -250,16 +252,15 @@ extract_core_lualibs = (version) ->
         early_new_globals[g] = true
     else
       new_globals = [g for g in *new_globals when early_new_globals[g] == nil]
-    loaded_module_names = if loaded_module
+
+    local loaded_module_returns
+    if loaded_module
       library_module_name = library\gsub "-", "_"
-      extract_table_namespace loaded_module, "#{library_module_name}."
-    else
-      nil
-    if loaded_module_names
-      table.sort loaded_module_names
+      loaded_module_returns = extract_table_namespace loaded_module, "#{library_module_name}."
+      table.sort loaded_module_returns
 
     -- Options here are to ensure multi-line, stably-sorted JSON files so they're more git-friendly
-    rapidjson.dump {:new_globals, :loaded_module_names, :library}, cached_file, { pretty: true, sort: true }
+    rapidjson.dump {:new_globals, :loaded_module_returns, :library}, cached_file, { pretty: true, sort_keys: true }
   return
 
 LIFT_CORE_LUALIB_FORMAT_STR = [[
@@ -601,6 +602,7 @@ generate_luacheckrc_files = (versions) ->
     instrument_mode_globals = global_paths_to_luacheckrc INSTRUMENT_MODE_LUA_GLOBALS
 
     factorio_min_globals = table_intersection data_stage_new_globals, runtime_stage_new_globals
+    -- TODO add per-lualib extension standards, and update readme
     luacheckrc =
       stds:
         factorio_data_stage: data_stage_new_globals
@@ -608,9 +610,10 @@ generate_luacheckrc_files = (versions) ->
         factorio_instrument_mode: instrument_mode_globals
         factorio_min: factorio_min_globals
 
+    -- Options here are to ensure multi-line, stably-sorted JSON files so they're more git-friendly
     with assert(io.open luacheckrc_path, "w", "Couldn't open #{luacheckrc_path} for writing")
       \write "return "
-      \write serpent.serialize luacheckrc, {indent: "  "}
+      \write serpent.serialize luacheckrc, {indent: "  ", sortkeys: true, sparse: true}
       \close!
 
 

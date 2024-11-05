@@ -1,4 +1,5 @@
 {
+    "library": "story",
     "new_globals": [
         "add_button",
         "deconstruct_on_tick",
@@ -32,6 +33,5 @@
         "story_update",
         "surface",
         "tip_story_init"
-    ],
-    "library": "story"
+    ]
 }

@@ -1,9 +1,6 @@
 {
     "library": "util",
-    "new_globals": [
-        "table.compare",
-        "table.deepcopy",
-        "util",
+    "loaded_module_returns": [
         "util.add_shift",
         "util.add_shift_offset",
         "util.by_pixel",
@@ -56,7 +53,10 @@
         "util.technology_icon_constant_speed",
         "util.technology_icon_constant_stack_size"
     ],
-    "loaded_module_names": [
+    "new_globals": [
+        "table.compare",
+        "table.deepcopy",
+        "util",
         "util.add_shift",
         "util.add_shift_offset",
         "util.by_pixel",

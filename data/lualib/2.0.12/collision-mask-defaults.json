@@ -1,7 +1,6 @@
 {
     "library": "collision-mask-defaults",
-    "new_globals": {},
-    "loaded_module_names": [
+    "loaded_module_returns": [
         "collision_mask_defaults.accumulator",
         "collision_mask_defaults.accumulator.layers",
         "collision_mask_defaults.accumulator.layers.is_lower_object",
@@ -952,5 +951,6 @@
         "collision_mask_defaults.wall.layers.object",
         "collision_mask_defaults.wall.layers.player",
         "collision_mask_defaults.wall.layers.water_tile"
-    ]
+    ],
+    "new_globals": {}
 }
