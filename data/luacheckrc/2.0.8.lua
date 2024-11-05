@@ -4689,6 +4689,1764 @@ return {
         on_error = {}
       }
     },
+    factorio_lualib_bonus_gui_ordering = {
+      read_globals = {
+        bonus_gui_ordering = {
+          fields = {
+            ["artillery-shell"] = {},
+            artillery_range = {},
+            beacon_distribution = {},
+            beam = {},
+            biological = {},
+            bulk_inserter = {},
+            bullet = {},
+            ["cannon-shell"] = {},
+            capsule = {},
+            character = {},
+            electric = {},
+            flamethrower = {},
+            follower_robots = {},
+            grenade = {},
+            inserter = {},
+            landmine = {},
+            laser = {},
+            melee = {},
+            mining_productivity = {},
+            research_speed = {},
+            rocket = {},
+            ["shotgun-shell"] = {},
+            stack_inserter = {},
+            train_braking_force = {},
+            turret_attack = {},
+            worker_robots = {}
+          }
+        }
+      }
+    },
+    factorio_lualib_circuit_connector_sprites = {
+      read_globals = {
+        assembling_machine_circuit_wire_max_distance = {},
+        belt_connector_template = {
+          fields = {
+            led_blue = {
+              fields = {
+                draw_as_glow = {},
+                filename = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            led_green = {
+              fields = {
+                draw_as_glow = {},
+                filename = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            led_red = {
+              fields = {
+                draw_as_glow = {},
+                filename = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            light_offsets = {},
+            wire_offsets = {},
+            wire_shadow_offsets = {}
+          }
+        },
+        belt_frame_connector_template = {
+          fields = {
+            back_patch = {
+              fields = {
+                sheet = {
+                  fields = {
+                    filename = {},
+                    height = {},
+                    line_length = {},
+                    priority = {},
+                    scale = {},
+                    shift = {},
+                    variation_count = {},
+                    width = {}
+                  }
+                }
+              }
+            },
+            frame_main = {
+              fields = {
+                sheet = {
+                  fields = {
+                    filename = {},
+                    frame_count = {},
+                    height = {},
+                    line_length = {},
+                    priority = {},
+                    scale = {},
+                    shift = {},
+                    variation_count = {},
+                    width = {}
+                  }
+                }
+              }
+            },
+            frame_main_scanner = {
+              fields = {
+                draw_as_glow = {},
+                filename = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            frame_shadow = {
+              fields = {
+                sheet = {
+                  fields = {
+                    draw_as_shadow = {},
+                    filename = {},
+                    frame_count = {},
+                    height = {},
+                    line_length = {},
+                    priority = {},
+                    scale = {},
+                    shift = {},
+                    variation_count = {},
+                    width = {}
+                  }
+                }
+              }
+            },
+            wire_offset_hotfix = {},
+            wire_shadow_offset_hotfix = {}
+          }
+        },
+        circuit_connector_definitions = {
+          fields = {
+            accumulator = {
+              fields = {
+                points = {
+                  fields = {
+                    shadow = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    },
+                    wire = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    }
+                  }
+                },
+                sprites = {
+                  fields = {
+                    blue_led_light_offset = {},
+                    connector_main = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    connector_shadow = {
+                      fields = {
+                        draw_as_shadow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue_off = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_green = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_light = {
+                      fields = {
+                        intensity = {},
+                        size = {}
+                      }
+                    },
+                    led_red = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    red_green_led_light_offset = {},
+                    wire_pins = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    wire_pins_shadow = {
+                      fields = {
+                        draw_as_shadow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            ["artillery-turret"] = {
+              fields = {
+                points = {
+                  fields = {
+                    shadow = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    },
+                    wire = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    }
+                  }
+                },
+                sprites = {
+                  fields = {
+                    blue_led_light_offset = {},
+                    connector_main = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue_off = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_green = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_light = {
+                      fields = {
+                        intensity = {},
+                        size = {}
+                      }
+                    },
+                    led_red = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    red_green_led_light_offset = {},
+                    wire_pins = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            ["assembling-machine"] = {},
+            belt = {},
+            ["burner-mining-drill"] = {},
+            ["cargo-landing-pad"] = {
+              fields = {
+                points = {
+                  fields = {
+                    shadow = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    },
+                    wire = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            centrifuge = {},
+            ["chemical-plant"] = {},
+            chest = {
+              fields = {
+                points = {
+                  fields = {
+                    shadow = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    },
+                    wire = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    }
+                  }
+                },
+                sprites = {
+                  fields = {
+                    blue_led_light_offset = {},
+                    connector_main = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    connector_shadow = {
+                      fields = {
+                        draw_as_shadow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue_off = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_green = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_light = {
+                      fields = {
+                        intensity = {},
+                        size = {}
+                      }
+                    },
+                    led_red = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    red_green_led_light_offset = {},
+                    wire_pins = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    wire_pins_shadow = {
+                      fields = {
+                        draw_as_shadow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            create_single = {},
+            create_vector = {},
+            ["electric-mining-drill"] = {},
+            ["elevated-rail-chain-signal"] = {},
+            ["elevated-rail-signal"] = {},
+            ["flamethrower-turret"] = {},
+            ["gun-turret"] = {},
+            inserter = {},
+            lamp = {
+              fields = {
+                points = {
+                  fields = {
+                    shadow = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    },
+                    wire = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    }
+                  }
+                },
+                sprites = {
+                  fields = {
+                    blue_led_light_offset = {},
+                    connector_main = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    connector_shadow = {
+                      fields = {
+                        draw_as_shadow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue_off = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_green = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_light = {
+                      fields = {
+                        intensity = {},
+                        size = {}
+                      }
+                    },
+                    led_red = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    red_green_led_light_offset = {},
+                    wire_pins = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    wire_pins_shadow = {
+                      fields = {
+                        draw_as_shadow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            ["laser-turret"] = {},
+            ["loader-1x2"] = {},
+            ["nuclear-reactor"] = {
+              fields = {
+                points = {
+                  fields = {
+                    shadow = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    },
+                    wire = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    }
+                  }
+                },
+                sprites = {
+                  fields = {
+                    blue_led_light_offset = {},
+                    connector_main = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue_off = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_green = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_light = {
+                      fields = {
+                        intensity = {},
+                        size = {}
+                      }
+                    },
+                    led_red = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    red_green_led_light_offset = {},
+                    wire_pins = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            ["offshore-pump"] = {},
+            ["oil-refinery"] = {},
+            ["programmable-speaker"] = {
+              fields = {
+                points = {
+                  fields = {
+                    shadow = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    },
+                    wire = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    }
+                  }
+                },
+                sprites = {
+                  fields = {
+                    blue_led_light_offset = {},
+                    connector_main = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    connector_shadow = {
+                      fields = {
+                        draw_as_shadow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue_off = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_green = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_light = {
+                      fields = {
+                        intensity = {},
+                        size = {}
+                      }
+                    },
+                    led_red = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    red_green_led_light_offset = {},
+                    wire_pins = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    wire_pins_shadow = {
+                      fields = {
+                        draw_as_shadow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            pump = {},
+            pumpjack = {},
+            radar = {
+              fields = {
+                points = {
+                  fields = {
+                    shadow = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    },
+                    wire = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    }
+                  }
+                },
+                sprites = {
+                  fields = {
+                    blue_led_light_offset = {},
+                    connector_main = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue_off = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_green = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_light = {
+                      fields = {
+                        intensity = {},
+                        size = {}
+                      }
+                    },
+                    led_red = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    red_green_led_light_offset = {},
+                    wire_pins = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            ["rail-chain-signal"] = {},
+            ["rail-signal"] = {},
+            roboport = {
+              fields = {
+                points = {
+                  fields = {
+                    shadow = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    },
+                    wire = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    }
+                  }
+                },
+                sprites = {
+                  fields = {
+                    blue_led_light_offset = {},
+                    connector_main = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue_off = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_green = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_light = {
+                      fields = {
+                        intensity = {},
+                        size = {}
+                      }
+                    },
+                    led_red = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    red_green_led_light_offset = {},
+                    wire_pins = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            ["rocket-silo"] = {},
+            ["storage-tank"] = {},
+            ["train-station"] = {},
+            wall = {
+              fields = {
+                points = {
+                  fields = {
+                    shadow = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    },
+                    wire = {
+                      fields = {
+                        green = {},
+                        red = {}
+                      }
+                    }
+                  }
+                },
+                sprites = {
+                  fields = {
+                    blue_led_light_offset = {},
+                    connector_main = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_blue_off = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_green = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    led_light = {
+                      fields = {
+                        intensity = {},
+                        size = {}
+                      }
+                    },
+                    led_red = {
+                      fields = {
+                        draw_as_glow = {},
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    },
+                    red_green_led_light_offset = {},
+                    wire_pins = {
+                      fields = {
+                        filename = {},
+                        height = {},
+                        priority = {},
+                        scale = {},
+                        shift = {},
+                        width = {},
+                        x = {},
+                        y = {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        default_circuit_wire_max_distance = {},
+        inserter_circuit_wire_max_distance = {},
+        inserter_connector_template = {
+          fields = {
+            connector_main = {
+              fields = {
+                filename = {},
+                flags = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            connector_shadow = {
+              fields = {
+                draw_as_shadow = {},
+                filename = {},
+                flags = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            led_blue = {
+              fields = {
+                draw_as_glow = {},
+                filename = {},
+                flags = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            led_blue_off = {
+              fields = {
+                filename = {},
+                flags = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            led_green = {
+              fields = {
+                draw_as_glow = {},
+                filename = {},
+                flags = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            led_red = {
+              fields = {
+                draw_as_glow = {},
+                filename = {},
+                flags = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            light_offsets = {},
+            wire_offset_hotfix = {},
+            wire_offsets = {},
+            wire_pins = {
+              fields = {
+                filename = {},
+                flags = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            wire_pins_shadow = {
+              fields = {
+                draw_as_shadow = {},
+                filename = {},
+                flags = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            wire_shadow_offset_hotfix = {},
+            wire_shadow_offsets = {}
+          }
+        },
+        inserter_default_stack_control_input_signal = {
+          fields = {
+            name = {},
+            type = {}
+          }
+        },
+        reactor_circuit_wire_max_distance = {},
+        transport_belt_circuit_wire_max_distance = {},
+        transport_belt_connector_frame_sprites = {
+          fields = {
+            frame_back_patch = {
+              fields = {
+                sheet = {
+                  fields = {
+                    filename = {},
+                    height = {},
+                    line_length = {},
+                    priority = {},
+                    scale = {},
+                    shift = {},
+                    variation_count = {},
+                    width = {}
+                  }
+                }
+              }
+            },
+            frame_main = {
+              fields = {
+                sheet = {
+                  fields = {
+                    filename = {},
+                    frame_count = {},
+                    height = {},
+                    line_length = {},
+                    priority = {},
+                    scale = {},
+                    shift = {},
+                    variation_count = {},
+                    width = {}
+                  }
+                }
+              }
+            },
+            frame_main_scanner = {
+              fields = {
+                draw_as_glow = {},
+                filename = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            frame_main_scanner_cross_horizontal_end_shift = {},
+            frame_main_scanner_cross_horizontal_rotation = {},
+            frame_main_scanner_cross_horizontal_start_shift = {},
+            frame_main_scanner_cross_horizontal_y_scale = {},
+            frame_main_scanner_cross_vertical_end_shift = {},
+            frame_main_scanner_cross_vertical_rotation = {},
+            frame_main_scanner_cross_vertical_start_shift = {},
+            frame_main_scanner_cross_vertical_y_scale = {},
+            frame_main_scanner_horizontal_end_shift = {},
+            frame_main_scanner_horizontal_rotation = {},
+            frame_main_scanner_horizontal_start_shift = {},
+            frame_main_scanner_horizontal_y_scale = {},
+            frame_main_scanner_movement_speed = {},
+            frame_main_scanner_nw_ne = {
+              fields = {
+                blend_mode = {},
+                draw_as_glow = {},
+                filename = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                shift = {},
+                width = {}
+              }
+            },
+            frame_main_scanner_sw_se = {
+              fields = {
+                blend_mode = {},
+                draw_as_glow = {},
+                filename = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                shift = {},
+                width = {}
+              }
+            },
+            frame_main_scanner_vertical_end_shift = {},
+            frame_main_scanner_vertical_rotation = {},
+            frame_main_scanner_vertical_start_shift = {},
+            frame_main_scanner_vertical_y_scale = {},
+            frame_shadow = {
+              fields = {
+                sheet = {
+                  fields = {
+                    draw_as_shadow = {},
+                    filename = {},
+                    frame_count = {},
+                    height = {},
+                    line_length = {},
+                    priority = {},
+                    scale = {},
+                    shift = {},
+                    variation_count = {},
+                    width = {}
+                  }
+                }
+              }
+            }
+          }
+        },
+        universal_connector_template = {
+          fields = {
+            connector_main = {
+              fields = {
+                filename = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            connector_shadow = {
+              fields = {
+                draw_as_shadow = {},
+                filename = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            led_blue = {
+              fields = {
+                draw_as_glow = {},
+                filename = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            led_blue_off = {
+              fields = {
+                filename = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            led_green = {
+              fields = {
+                draw_as_glow = {},
+                filename = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            led_red = {
+              fields = {
+                draw_as_glow = {},
+                filename = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            light_offsets = {},
+            wire_offsets = {},
+            wire_pins = {
+              fields = {
+                filename = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            wire_pins_shadow = {
+              fields = {
+                draw_as_shadow = {},
+                filename = {},
+                frame_count = {},
+                height = {},
+                line_length = {},
+                priority = {},
+                scale = {},
+                shift = {},
+                width = {}
+              }
+            },
+            wire_shadow_offsets = {}
+          }
+        }
+      }
+    },
+    factorio_lualib_resource_autoplace = {
+      read_globals = {
+        autoplace_sets = {},
+        get_autoplace_set = {}
+      }
+    },
+    factorio_lualib_sound_util = {
+      read_globals = {
+        sound_variations = {},
+        sound_variations_with_volume_variations = {},
+        volume_multiplier = {}
+      }
+    },
+    factorio_lualib_story = {
+      read_globals = {
+        add_button = {},
+        deconstruct_on_tick = {},
+        export_entities = {},
+        find_gui_recursive = {},
+        flash_goal = {},
+        flying_congrats = {},
+        limit_camera = {},
+        on_gui_click = {},
+        on_player_joined = {},
+        player = {},
+        player_set_goal = {},
+        player_set_info = {},
+        recreate_entities = {},
+        recreate_entities_on_tick = {},
+        set_continue_button_style = {},
+        set_goal = {},
+        set_info = {},
+        story_add_update = {},
+        story_custom_handlers = {
+          fields = {
+            ["@add_button"] = {},
+            ["@add_continue_button"] = {},
+            ["@add_finish_button"] = {}
+          }
+        },
+        story_elapsed = {},
+        story_elapsed_check = {},
+        story_init = {},
+        story_init_helpers = {},
+        story_jump_to = {},
+        story_remove_update = {},
+        story_show_message_dialog = {},
+        story_update = {},
+        surface = {},
+        tip_story_init = {}
+      }
+    },
+    factorio_lualib_util = {
+      read_globals = {
+        gram = {},
+        grams = {},
+        hour = {},
+        kg = {},
+        kilometer = {},
+        meter = {},
+        minute = {},
+        second = {},
+        table = {
+          fields = {
+            compare = {},
+            deepcopy = {}
+          }
+        },
+        tons = {},
+        util = {
+          fields = {
+            add_shift = {},
+            add_shift_offset = {},
+            by_pixel = {},
+            by_pixel_hr = {},
+            clamp = {},
+            color = {},
+            combine_icons = {},
+            conditional_return = {},
+            copy = {},
+            direction_vectors = {},
+            distance = {},
+            draw_as_glow = {},
+            empty_animation = {},
+            empty_icon = {},
+            empty_sprite = {},
+            foreach_sprite_definition = {},
+            format_number = {},
+            formattime = {},
+            get_color_with_alpha = {},
+            get_recipe_main_product = {},
+            get_walkable_tile = {},
+            increment = {},
+            insert_safe = {},
+            list_to_map = {},
+            merge = {},
+            mix_color = {},
+            moveposition = {},
+            mul_shift = {},
+            multiply_color = {},
+            multiplystripes = {},
+            normalize_recipe_product = {},
+            normalize_recipe_products = {},
+            oppositedirection = {},
+            parse_energy = {},
+            positiontostr = {},
+            premul_color = {},
+            product_amount = {},
+            remove_from_list = {},
+            remove_safe = {},
+            remove_tile_references = {},
+            rotate_position = {},
+            split = {},
+            split_whitespace = {},
+            sprite_load = {},
+            spritesheets_to_pictures = {},
+            string_replace = {},
+            string_starts_with = {},
+            table = {
+              fields = {
+                compare = {},
+                deepcopy = {}
+              }
+            },
+            technology_icon_constant_braking_force = {},
+            technology_icon_constant_capacity = {},
+            technology_icon_constant_damage = {},
+            technology_icon_constant_equipment = {},
+            technology_icon_constant_followers = {},
+            technology_icon_constant_mining = {},
+            technology_icon_constant_movement_speed = {},
+            technology_icon_constant_planet = {},
+            technology_icon_constant_productivity = {},
+            technology_icon_constant_range = {},
+            technology_icon_constant_recipe_productivity = {},
+            technology_icon_constant_speed = {},
+            technology_icon_constant_stack_size = {}
+          }
+        }
+      }
+    },
     factorio_min = {
       read_globals = {
         _ENV = {

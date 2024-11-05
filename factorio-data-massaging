@@ -77,43 +77,59 @@ FIRST_VERSION_WITH_RUNTIME_DOCS = semver.new 1, 1, 35
 FIRST_VERSION_WTIH_PROTOTYPE_DOCS = semver.new 1, 1, 89
 
 main = ->
-  doc_version_list = get_doc_versions!
-  ensure_docs doc_version_list
-
   parser = argparse!
   with parser
     \name "factorio-data-generation"
     \description "A tool for generating useful data and configuration from Factorio (meta)data files"
+    \command "update"
     \command "latest-version"
-    \command "luacheckrc"
     \command "extract-core-lualibs"
+    \command "luacheckrc"
     \command "validate"
     \command_target "command"
     \require_command false
 
   args = parser\parse arg
-  print "args: #{inspect args}"
 
+  if args.command == "update"
+    unix.unlink "#{CACHE_DIR}/api-docs-version-list.html"
+
+  versions = get_doc_versions!
+  ensure_docs versions
   switch args.command
-    -- TODO generic "update" command that invalidates the cached version list
-    -- and runs the entire pipeline and TODO update the docs to mention it
-    when "extract-core-lualibs"
-      ensure_factorio_data!
-      for version in *doc_version_list
-        extract_core_lualibs version
+    when "update"
+      cmd_latest_version versions
+      cmd_extract_core_lualibs versions
+      generate_luacheckrc_files versions
+      validate_json_docs versions
     when "latest-version"
-      most_recent_version = doc_version_list[#doc_version_list]
-      print most_recent_version
+      cmd_latest_version versions
+    when "extract-core-lualibs"
+      cmd_extract_core_lualibs versions
     when "luacheckrc"
-      generate_luacheckrc_files doc_version_list
+      generate_luacheckrc_files versions
     when "validate"
-      validate_json_docs doc_version_list
+      validate_json_docs versions
 
   return
 
 
 debug_print = (...) ->
   (os.getenv "DEBUG") and print(...)
+
+
+cmd_latest_version = (versions) ->
+  most_recent_version = versions[#versions]
+  ver_file = io.open "#{DATA_DIR}/most-recent-version", "w"
+  ver_file\write "#{most_recent_version}\n"
+  return
+
+
+cmd_extract_core_lualibs = (versions) ->
+  ensure_factorio_data!
+  for version in *versions
+    extract_core_lualibs version
+  return
 
 
 get_doc_versions = ->
@@ -148,10 +164,12 @@ ensure_docs = (doc_version_list) ->
 
 ensure_factorio_data = () ->
   unless unix.stat FACTORIO_DATA_REPO_DIR
-    cmd = "git clone --bare https://github.com/wube/factorio-data #{FACTORIO_DATA_REPO_DIR}"
+    cmd = "git clone --mirror https://github.com/wube/factorio-data #{FACTORIO_DATA_REPO_DIR}"
     print "Fetching factorio-data repo: #{cmd}"
     run_cmd cmd
   else
+    cmd = "git -C #{FACTORIO_DATA_REPO_DIR} remote update"
+    print "Updating factorio-data repo remotes: #{cmd}"
     cmd = "git -C #{FACTORIO_DATA_REPO_DIR} fetch --all"
     print "Updating factorio-data repo: #{cmd}"
     run_cmd cmd
@@ -524,13 +542,27 @@ generate_luacheckrc_files = (versions) ->
       print "#{version}: Building luacheckrc output file"
     runtime_api_json = rapidjson.load "#{RUNTIME_DOCS_DIR}/#{version}.json"
 
-    -- Include core-mod's `util`, `bonus-gui-ordering`, and `sound-util`
-    -- libraries as part of the accessible globals during the prototype stage, as
-    -- these are loaded by the core-mod at that point, and the prototype stage
-    -- uses a single shared Lua state for all mods.
-    lualibs_set = {lib, true for lib in *PROTOTYPE_LOADED_LUALIBS}
-    lualib_data_stage_globals = populate_lualib_globals version, lualibs_set
-      |> global_paths_to_luacheckrc
+    lualib_globals = {}
+    lualib_data_stage_globals = {}
+    lualib_data_stage_set = {lib, true for lib in *PROTOTYPE_LOADED_LUALIBS}
+
+    lib_dir_files = lsdir "#{FACTORIO_DATA_DIR}/#{version}/core/lualib"
+    for child_path in *lib_dir_files
+      lib = child_path\match "^(.+)%.lua$"
+      continue unless lib
+      lualib_globals[lib] = {}
+      for global_path in *(populate_lualib_globals version, lib)
+        lualib_globals[lib][]= global_path
+
+        -- Include core-mod's `util`, `bonus-gui-ordering`, and `sound-util`
+        -- libraries as part of the accessible globals during the prototype stage,
+        -- as these are loaded by the core-mod at that point, and the prototype
+        -- stage uses a single shared Lua state for all mods.
+        if lualib_data_stage_set[lib]
+          lualib_data_stage_globals[]= global_path
+      lualib_globals[lib] = global_paths_to_luacheckrc lualib_globals[lib]
+
+    lualib_data_stage_globals = global_paths_to_luacheckrc lualib_data_stage_globals
 
     runtime_stage_defines = extract_luacheckrc_defines runtime_api_json
     runtime_stage_dynamic_globals, global_functions = extract_luacheckrc_json_api_globals runtime_api_json
@@ -602,13 +634,18 @@ generate_luacheckrc_files = (versions) ->
     instrument_mode_globals = global_paths_to_luacheckrc INSTRUMENT_MODE_LUA_GLOBALS
 
     factorio_min_globals = table_intersection data_stage_new_globals, runtime_stage_new_globals
-    -- TODO add per-lualib extension standards, and update readme
     luacheckrc =
       stds:
         factorio_data_stage: data_stage_new_globals
         factorio_control_stage: runtime_stage_new_globals
         factorio_instrument_mode: instrument_mode_globals
         factorio_min: factorio_min_globals
+
+    for lualib, block in pairs lualib_globals
+      if next(block.read_globals) == nil
+        -- Skip lualibs which do not add any globals
+        continue
+      luacheckrc.stds["factorio_lualib_#{lualib\gsub "-", "_"}"] = block
 
     -- Options here are to ensure multi-line, stably-sorted JSON files so they're more git-friendly
     with assert(io.open luacheckrc_path, "w", "Couldn't open #{luacheckrc_path} for writing")
@@ -617,26 +654,24 @@ generate_luacheckrc_files = (versions) ->
       \close!
 
 
-populate_lualib_globals = (version, restrict_libs_to=nil) ->
-  lualib_dir = "#{LUA_DATA_DIR}/#{version}"
+populate_lualib_globals = (version, lualib) ->
   lualib_globals = {}
   -- Include core-mod's `util`, `bonus-gui-ordering`, and `sound-util`
   -- libraries as part of the accessible globals during the prototype stage, as
   -- these are loaded by the core-mod at that point, and the prototype stage
   -- uses a single shared Lua state for all mods.
-  lualibs = {}
-  lib_dir_files = lsdir lualib_dir
-  for child_path in *lib_dir_files
-    libname = child_path\match "^(.+)%.json$"
-    continue unless libname
-    continue if restrict_libs_to and restrict_libs_to[libname] == nil
-    lualibs[]= libname
-    lualib_json = rapidjson.load "#{lualib_dir}/#{libname}.json"
+  lualib_path = "#{LUA_DATA_DIR}/#{version}/#{lualib}.json"
+  -- Some lualibs do not exist for some versions, so return an empty set for
+  -- them
+  if unix.stat lualib_path
+    lualib_json = rapidjson.load lualib_path
     for path in *lualib_json.new_globals
       lualib_globals[path] = true
-  lualib_globals = strip_lax_globals lualibs, lualib_globals
-  lualib_globals = [k for k, _ in pairs lualib_globals]
+
+    lualib_globals = strip_lax_globals {lualib}, lualib_globals
+    lualib_globals = [k for k, _v in pairs lualib_globals]
   return lualib_globals
+
 
 
 -- Remove entries for the libraries/global objects themselves, if they have any

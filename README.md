@@ -34,7 +34,11 @@
   prototype JSON API doc versions, along with some notes on each.
 
 `factorio-data-massaging` and its supporting `lib` constitute the script used
-to generate everything in `data`.
+to generate everything in `data`. It's not really documented at this point, but
+if you're on Linux, already have a working Nix installation, and have direnv
+configured, you can do `direnv allow` to get a suitable environment setup, then
+run `./factorio-data-massaging update` and it should produce new data files for
+any new version(s) of Factorio.
 
 ## Why?
 I wanted a relatively-strict luacheck configuration file covering Factorio's
