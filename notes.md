@@ -2,7 +2,7 @@
 
 - The `core` mod's `lualib` folder is in the `require` path of any mod, and we
   can also reliably `require` files from other 1st-party mods if we depend on
-  them, it Could be worthwhile to generate completions etc. for these as well
+  them, it could be worthwhile to generate completions etc. for these as well
 
 
 ## Interpreting Runtime API JSON Docs
