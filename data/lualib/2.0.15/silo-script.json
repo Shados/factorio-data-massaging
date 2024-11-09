@@ -1,0 +1,13 @@
+{
+    "library": "silo-script",
+    "loaded_module_returns": [
+        "silo_script.add_commands",
+        "silo_script.add_remote_interface",
+        "silo_script.events",
+        "silo_script.get_events",
+        "silo_script.on_configuration_changed",
+        "silo_script.on_init",
+        "silo_script.on_load"
+    ],
+    "new_globals": {}
+}

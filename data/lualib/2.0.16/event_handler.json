@@ -1,0 +1,8 @@
+{
+    "library": "event_handler",
+    "loaded_module_returns": [
+        "event_handler.add_lib",
+        "event_handler.add_libraries"
+    ],
+    "new_globals": {}
+}
