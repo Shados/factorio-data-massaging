@@ -1,0 +1,8 @@
+{
+    "library": "sound-util",
+    "new_globals": [
+        "sound_variations",
+        "sound_variations_with_volume_variations",
+        "volume_multiplier"
+    ]
+}

@@ -1,0 +1,8 @@
+{
+    "library": "surface-render-parameter-effects",
+    "loaded_module_returns": [
+        "surface_render_parameter_effects.default_clouds_effect_properties",
+        "surface_render_parameter_effects.default_fog_effect_properties"
+    ],
+    "new_globals": {}
+}

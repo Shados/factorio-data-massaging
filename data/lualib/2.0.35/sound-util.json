@@ -1,0 +1,10 @@
+{
+    "library": "sound-util",
+    "new_globals": [
+        "default_tile_sounds_advanced_volume_control",
+        "make_sound_variations",
+        "sound_variations",
+        "sound_variations_with_volume_variations",
+        "volume_multiplier"
+    ]
+}
